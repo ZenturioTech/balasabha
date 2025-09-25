@@ -5,16 +5,16 @@ const Hero: React.FC = () => {
         <section className="relative h-[70vh] sm:h-[85vh] w-full text-white overflow-hidden shadow-lg">
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
-                <img src="https://i.ibb.co/HfcZPxjR/hawaii-beach-landscape-with-nature-coastline.jpg" alt="Coastal landscape at sunset" className="w-full h-full object-cover" />
+                <img src="public/images/hawaii-beach-landscape-with-nature-coastline.jpg" alt="Coastal landscape at sunset" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/30"></div>
             </div>
 
             {/* Header Bar */}
             <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-30 w-[90%] max-w-3xl">
                 <div className="bg-white rounded-full shadow-lg px-4 sm:px-6 py-2 flex items-center justify-between">
-                    <img src="https://i.ibb.co/bjMxwN51/kerala-final-emblem-0.jpg" alt="Kerala Government Emblem" className="h-8 sm:h-10" />
-                    <img src="https://i.ibb.co/TMnhybB2/Layer-2-copy-1.png" alt="Dream Vibes Logo" className="h-10 sm:h-12" />
-                    <img src="https://i.ibb.co/PzYNzDhC/Kudumbasree-Logo-Vector-svg.png" alt="Balasabha Logo" className="h-8 sm:h-10" />
+                    <img src="public/images/kerala final emblem_0.jpg" alt="Kerala Government Emblem" className="h-8 sm:h-10" />
+                    <img src="public/images/Layer 2 copy (1).png" alt="Dream Vibes Logo" className="h-10 sm:h-12" />
+                    <img src="public/images/Kudumbasree-Logo-Vector.svg-.png" alt="Balasabha Logo" className="h-8 sm:h-10" />
                 </div>
             </header>
 
@@ -35,7 +35,7 @@ const Hero: React.FC = () => {
                 {/* Character Image */}
                 {/* Absolutely positioned relative to the max-w-7xl container */}
                 <div className="absolute z-20 bottom-0 right-0 w-40 sm:w-80 md:w-[28rem] md:h-[28rem]lg:w-[35rem] max-w-[90vw] lg:max-w-none lg:right-4 xl:right-8">
-                    <img src="https://i.ibb.co/F4BcRTS3/Gemini-Generated-Image-4koq2c4koq2c4koq-removebg-preview.png" alt="Cartoon boy and girl with backpacks" className="w-full h-auto" />
+                    <img src="/images/gb.png" alt="Cartoon boy and girl with backpacks" className="w-full h-auto" />
                 </div>
             </div>
         </section>

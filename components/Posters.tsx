@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
 const posterData = [
-  { id: 1, src: 'https://i.ibb.co/fYFKdhnb/Whats-App-Image-2025-09-24-at-18-12-39-1.jpg', alt: 'Dream Vibes poster with illustrations of children' },
-  { id: 2, src: 'https://i.ibb.co/GKbcJ5f/Whats-App-Image-2025-09-24-at-18-12-40-1.jpg', alt: 'Dream Vibes poster with claymation children' },
-  { id: 3, src: 'https://i.ibb.co/wNGd6KtJ/Whats-App-Image-2025-09-24-at-18-12-40.jpg', alt: 'Dream Vibes poster with children reading outdoors' },
-  { id: 4, src: 'https://i.ibb.co/fYFKdhnb/Whats-App-Image-2025-09-24-at-18-12-39-1.jpg', alt: 'Dream Vibes poster with illustrations of children' },
-  { id: 5, src: 'https://i.ibb.co/GKbcJ5f/Whats-App-Image-2025-09-24-at-18-12-40-1.jpg', alt: 'Dream Vibes poster with claymation children' },
-  { id: 6, src: 'https://i.ibb.co/wNGd6KtJ/Whats-App-Image-2025-09-24-at-18-12-40.jpg', alt: 'Dream Vibes poster with children reading outdoors' },
+  { id: 1, src: '/images/bsp (1).jpeg', alt: 'Dream Vibes poster with illustrations of children' },
+  { id: 2, src: 'public/images/bsp (2).jpeg', alt: 'Dream Vibes poster with claymation children' },
+  { id: 3, src: 'public/images/bsp (3).jpeg', alt: 'Dream Vibes poster with children reading outdoors' },
+  { id: 4, src: 'public/images/bsp (4).jpeg', alt: 'Dream Vibes poster with illustrations of children' },
+  { id: 5, src: 'public/images/bsp (2).jpeg', alt: 'Dream Vibes poster with claymation children' },
+  { id: 6, src: 'public/images/bsp (3).jpeg', alt: 'Dream Vibes poster with children reading outdoors' },
 ];
 
 const Posters: React.FC = () => {

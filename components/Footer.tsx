@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
                      {/* The logo in the user's image has a white background box */}
                     <div className="bg-white p-2">
                          <img 
-                            src="https://i.ibb.co/PzYNzDhC/Kudumbasree-Logo-Vector-svg.png" 
+                            src="public/images/Kudumbasree-Logo-Vector.svg-.png" 
                             alt="Kudumbashree Logo" 
                             className="h-20"
                         />

@@ -20,7 +20,7 @@ const Objectives: React.FC = () => {
                 {/* Left Image: Width now applies to all screen sizes */}
                 <div className="w-5/12 md:translate-x-20">
                     <img 
-                        src="https://i.ibb.co/BKwVLHsn/Gemini-Generated-Image-807mnz807mnz807m-removebg-preview.png" 
+                        src="public/images/Gemini_Generated_Image_807mnz807mnz807m-removebg-preview.png" 
                         alt="Cartoon of a boy and a girl in school uniform walking"
                         className="w-full max-w-sm mx-auto" 
                     />
@@ -33,7 +33,7 @@ const Objectives: React.FC = () => {
                     </h2>
                     <div className="mb-2 sm:mb-6">
                         <img 
-                            src="https://i.ibb.co/R4ymVfnQ/balasabha-new.jpg" 
+                            src="public/images/balasabha new.jpg" 
                             alt="Balasabha Logo" 
                             className="h-8 sm:h-12 md:h-16" 
                         />

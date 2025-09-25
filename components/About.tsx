@@ -15,23 +15,23 @@ const About: React.FC = () => {
                     {/* Left Icons Column */}
                     <div className="flex flex-col gap-8 md:gap-16">
                         <div className="w-20 h-20 md:w-28 md:h-28">
-                           <img src="https://i.ibb.co/HpnWyZ3Q/Gemini-Generated-Image-nxl4bnxl4bnxl4bn-removebg-preview.png" alt="Community Growth Icon" className="w-full h-full object-contain" />
+                           <img src="public/images/cicons (1).png" alt="Community Growth Icon" className="w-full h-full object-contain" />
                         </div>
                         <div className="w-20 h-20 md:w-28 md:h-28">
-                           <img src="https://i.ibb.co/994Mxj6Y/Gemini-Generated-Image-ko99m7ko99m7ko99-removebg-preview.png" alt="Critical Thinking Icon" className="w-full h-full object-contain" />
+                           <img src="public/images/cicons (2).png" alt="Critical Thinking Icon" className="w-full h-full object-contain" />
                         </div>
                     </div>
                     
                     {/* Central Image */}
-                    <img src="https://i.ibb.co/JRVGXrFG/Gemini-Generated-Image-m4a6pkm4a6pkm4a6.png" alt="Girl with a lightbulb idea" className="w-48 sm:w-56 md:w-72 h-auto" />
+                    <img src="public/images/girlw.png" alt="Girl with a lightbulb idea" className="w-48 sm:w-56 md:w-72 h-auto" />
                     
                     {/* Right Icons Column */}
                     <div className="flex flex-col gap-8 md:gap-16">
                         <div className="w-20 h-20 md:w-28 md:h-28">
-                           <img src="https://i.ibb.co/ZRSLk4PV/Gemini-Generated-Image-c9dhwlc9dhwlc9dh-removebg-preview.png" alt="Local Institutions Icon" className="w-full h-full object-contain" />
+                           <img src="public/images/cicons (3).png" alt="Local Institutions Icon" className="w-full h-full object-contain" />
                         </div>
                         <div className="w-20 h-20 md:w-28 md:h-28">
-                            <img src="https://i.ibb.co/4RvfNndZ/Gemini-Generated-Image-sh90fdsh90fdsh90-removebg-preview.png" alt="Social Awareness Icon" className="w-full h-full object-contain" />
+                            <img src="public/images/cicons (4).png" alt="Social Awareness Icon" className="w-full h-full object-contain" />
                         </div>
                     </div>
                 </div>

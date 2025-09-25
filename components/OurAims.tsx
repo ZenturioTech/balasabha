@@ -11,7 +11,7 @@ const OurAims: React.FC = () => {
                     <div className="relative z-10 w-[70%] max-w-xs sm:w-64 mx-auto lg:absolute lg:left-12 lg:top-1/2 lg:-translate-y-1/2 lg:z-20 lg:w-72">
                         <div className="bg-white p-3 rounded-xl shadow-2xl">
                             <img 
-                                src="https://picsum.photos/seed/balasabha/400/600" 
+                                src="/images/kids.png" 
                                 alt="Children participating in a Balasabha activity" 
                                 className="rounded-lg filter grayscale w-full h-96 lg:h-[450px] object-cover"
                             />
