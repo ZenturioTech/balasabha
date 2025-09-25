@@ -2,7 +2,7 @@ import React from 'react';
 
 const OurAims: React.FC = () => {
     return (
-        <section className="py-16 md:pt-32 px-4 sm:px-6">
+        <section className="pt-16 pb-0 md:pt-32 md:pb-16 px-4 sm:px-6">
             <div className="max-w-6xl mx-auto">
                 {/* This container becomes relative only on desktop to contain the absolute image */}
                 <div className="lg:relative">

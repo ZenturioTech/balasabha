@@ -97,7 +97,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
     });
     
     return (
-        <section id="interactive-section" ref={interactiveSectionRef} className="pt-12 sm:pt-16 pb-8 px-6 text-center mt-1">
+        <section id="interactive-section" ref={interactiveSectionRef} className="pt-12 sm:pt-16 pb-8 px-6 text-center">
             {/* Spotlight View */}
             <div id="spotlight-container" className={showDistricts ? 'hidden' : ''}>
                 <h2 className="text-3xl md:text-6xl font-bold text-teal-600  mb-12 font-serif">Dream Vibes Spotlight</h2>
