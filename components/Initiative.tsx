@@ -16,7 +16,7 @@ const Initiative: React.FC = () => {
                     aria-expanded={isExpanded}
                     aria-controls="initiative-description"
                 >
-                    <h2 className="text-3xl font-bold text-teal-600 font-serif group-hover:text-teal-700 transition-colors">Initiative by Balasabha</h2>
+                    <h2 className="text-3xl md:text-6xl font-bold text-teal-600 font-serif group-hover:text-teal-700 transition-colors">Initiative by Balasabha</h2>
                     <svg 
                         xmlns="http://www.w3.org/2000/svg" 
                         className={`h-6 w-6 text-teal-600 transform transition-transform duration-300 group-hover:text-teal-700 ${isExpanded ? 'rotate-180' : ''}`}

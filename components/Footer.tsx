@@ -7,14 +7,13 @@ const Footer: React.FC = () => {
                 
                 {/* Logo */}
                 <div className="flex-shrink-0">
-                     {/* The logo in the user's image has a white background box */}
-                    <div className="bg-white p-2">
+                    
                          <img 
-                            src="public/images/Kudumbasree-Logo-Vector.svg-.png" 
+                            src="/images/Kudumbasree-Logo-Vector.svg-.png" 
                             alt="Kudumbashree Logo" 
                             className="h-20"
                         />
-                    </div>
+                   
                 </div>
 
                 {/* Main Content: Centered */}
@@ -31,7 +30,7 @@ const Footer: React.FC = () => {
                 {/* Designed By */}
                 <div className="text-center md:text-right flex-shrink-0">
                     <p className="text-teal-700">Designed & Developed by</p>
-                    <a href="#" className="text-teal-800 font-semibold hover:underline">Zenturiotech pvt ltd.</a>
+                    <a href="#" className="text-teal-800 font-semibold hover:underline">Zenturiotech Private ltd.</a>
                 </div>
             </div>
         </footer>
