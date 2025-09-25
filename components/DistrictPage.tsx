@@ -43,7 +43,7 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, onBack }) => 
                     <div className="relative w-full mt-4">
                         <input 
                             type="text"
-                            placeholder="Search Panchayath/Block/Municipality"
+                            placeholder="Search Block/Urban Local Body(ULB)"
                             className="w-full text-sm sm:text-base pl-4 sm:pl-6 pr-24 sm:pr-32 py-3 sm:py-4 text-gray-700 bg-white border-2 border-gray-200 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder-gray-500"
                         />
                         <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-teal-500 text-white font-semibold text-sm sm:text-base py-2 px-4 sm:py-3 sm:px-8 rounded-full hover:bg-teal-600 transition-colors shadow-lg">
