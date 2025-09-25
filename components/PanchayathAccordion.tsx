@@ -1,37 +1,159 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { supabase } from '../services/supabaseClient';
 
-const panchayathData = [
-    { 
-        name: 'Varkala Block Panchayath', 
-        videos: [
-            { seed: 'acc1', name: 'Bhargav S', age: 18, location: 'Varkala', district: 'Trivandrum' },
-            { seed: 'acc2', name: 'Neha N', age: 18, location: 'Varkala', district: 'Trivandrum' },
-            { seed: 'acc3', name: 'Adithya V', age: 17, location: 'Varkala', district: 'Trivandrum' },
-            { seed: 'acc4', name: 'Sreya P', age: 16, location: 'Varkala', district: 'Trivandrum' },
-        ] 
-    },
-    { name: 'Kilimanoor Block Panchayath', videos: [] },
-    { name: 'Chirayinkeezh Block Panchayath', videos: [] },
-    { name: 'Vamanapuram Block Panchayath', videos: [] },
-    { name: 'Vellanad Block Panchayath', videos: [] },
-    { name: 'Nedumangad Block Panchayath', videos: [] },
-    { name: 'Pothencode Block Panchayath', videos: [] },
-    { name: 'Nemom Block Panchayath', videos: [] },
-    { name: 'Perumkadavila Block Panchayath', videos: [] },
-    { name: 'Athiyannoor Block Panchayath', videos: [] },
-    { name: 'Parassala Block Panchayath', videos: [] },
-];
+interface PanchayathAccordionProps {
+    districtName: string;
+}
 
-const PanchayathAccordion: React.FC = () => {
-    const [openIndex, setOpenIndex] = useState<number | null>(0);
+interface AccordionItem {
+    name: string;
+    blockName: string;
+    videos: any[];
+    loading: boolean;
+    error: string | null;
+}
 
-    const handleToggle = (index: number) => {
-        setOpenIndex(openIndex === index ? null : index);
+const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName }) => {
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+    const [blocks, setBlocks] = useState<string[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        let cancelled = false;
+        const loadCsv = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const res = await fetch('/panchayath.csv', { cache: 'force-cache' });
+                if (!res.ok) throw new Error('Failed to load panchayath.csv');
+                const text = await res.text();
+                const lines = text.split(/\r?\n/).filter(Boolean);
+                // Expect header: no,Panchayaths,Block,District
+                const header = lines.shift() || '';
+                const cols = header.split(',');
+                const districtIdx = cols.findIndex(c => c.trim().toLowerCase() === 'district');
+                const blockIdx = cols.findIndex(c => c.trim().toLowerCase() === 'block');
+                if (districtIdx === -1 || blockIdx === -1) throw new Error('Invalid CSV format');
+                const normalize = (d: string) => {
+                    const v = d.trim().toLowerCase();
+                    if (v === 'trivandrum') return 'thiruvananthapuram';
+                    return v;
+                };
+                const target = normalize(districtName);
+                const blockSet = new Set<string>();
+                for (const line of lines) {
+                    const parts = line.split(',');
+                    if (parts.length <= Math.max(districtIdx, blockIdx)) continue;
+                    const district = (parts[districtIdx] || '').trim();
+                    const block = (parts[blockIdx] || '').trim();
+                    if (!district || !block) continue;
+                    if (normalize(district) === target) {
+                        blockSet.add(block);
+                    }
+                }
+                if (!cancelled) {
+                    setBlocks(Array.from(blockSet).sort());
+                }
+            } catch (e: any) {
+                if (!cancelled) setError(e?.message || 'Failed to load blocks');
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        };
+        loadCsv();
+        return () => { cancelled = true; };
+    }, [districtName]);
+
+    const [items, setItems] = useState<AccordionItem[]>([]);
+
+    useEffect(() => {
+        setItems(blocks.map(b => ({ 
+            name: `${b} Block Panchayath`, 
+            blockName: b,
+            videos: [], 
+            loading: false, 
+            error: null 
+        })));
+    }, [blocks]);
+
+    const fetchBlockVideos = async (blockName: string, index: number) => {
+        if (items[index]?.videos.length > 0) return; // Already loaded
+        
+        // Update loading state
+        setItems(prev => prev.map((item, i) => 
+            i === index ? { ...item, loading: true, error: null } : item
+        ));
+        
+        try {
+            const { data, error: fetchError } = await supabase
+                .from('metadata')
+                .select('id, created_at, metadata, district, username, block_ulb, panchayath')
+                .or(`metadata->>block.ilike.%${blockName}%,block_ulb.ilike.%${blockName}%`)
+                .order('created_at', { ascending: false })
+                .limit(100);
+
+            if (fetchError) throw fetchError;
+
+            const mapped = (data as any[]).map((row) => {
+                const m = row.metadata ?? {};
+                const district = (m.district || row.district || '').toString();
+                const panch = (m.panchayath || row.panchayath || '').toString();
+                const wardRaw = m.ward ?? '';
+                const wardLabel = wardRaw ? `Ward ${wardRaw}` : '';
+                return {
+                    id: String(row.id),
+                    name: (m.name || row.username || 'Participant').toString(),
+                    district,
+                    panchayath: panch,
+                    wardLabel,
+                    thumbnailUrl: (m.thumbnailUrl || '/images/girlw.png').toString(),
+                    videoUrl: (m.videoUrl || '').toString(),
+                };
+            }).filter(v => v.videoUrl);
+
+            // Update the specific item with videos
+            setItems(prev => prev.map((item, i) => 
+                i === index ? { 
+                    ...item, 
+                    videos: mapped, 
+                    loading: false, 
+                    error: null 
+                } : item
+            ));
+        } catch (e: any) {
+            setItems(prev => prev.map((item, i) => 
+                i === index ? { 
+                    ...item, 
+                    loading: false, 
+                    error: e?.message || 'Failed to load videos' 
+                } : item
+            ));
+        }
+    };
+
+    const handleToggle = async (index: number) => {
+        const newOpenIndex = openIndex === index ? null : index;
+        setOpenIndex(newOpenIndex);
+        
+        // If opening, fetch videos for this block
+        if (newOpenIndex === index) {
+            await fetchBlockVideos(items[index].blockName, index);
+        }
     };
 
     return (
         <div className="space-y-2">
-            {panchayathData.map((item, index) => (
+            {loading && (
+                <div className="text-gray-600 text-center py-6">Loading blocks...</div>
+            )}
+            {error && (
+                <div className="text-red-600 text-center py-6">{error}</div>
+            )}
+            {!loading && !error && items.length === 0 && (
+                <div className="text-gray-500 text-center py-6">No blocks found for this district.</div>
+            )}
+            {!loading && !error && items.map((item, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg shadow-sm overflow-hidden bg-white">
                     <button
                         onClick={() => handleToggle(index)}
@@ -61,12 +183,18 @@ const PanchayathAccordion: React.FC = () => {
                         }`}
                     >
                         <div className="p-4 border-t border-gray-200">
-                            {item.videos.length > 0 ? (
+                            {item.loading && (
+                                <div className="text-gray-600 text-center py-4">Loading videos...</div>
+                            )}
+                            {item.error && (
+                                <div className="text-red-600 text-center py-4">{item.error}</div>
+                            )}
+                            {!item.loading && !item.error && item.videos.length > 0 && (
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                     {item.videos.map(video => (
-                                        <div key={video.seed} className="group relative">
+                                        <div key={video.id} className="group relative">
                                             <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg bg-white">
-                                                <img src={`https://picsum.photos/seed/${video.seed}/300/500`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Spotlight video thumbnail" />
+                                                <img src={video.thumbnailUrl} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Video thumbnail" />
                                                 <div className="absolute inset-0 bg-gradient-to-t from-teal-800/80 via-transparent to-black/20"></div>
                                                  <div className="absolute inset-0 flex items-center justify-center">
                                                     <div className="w-12 h-12 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-white/50 group-hover:scale-110">
@@ -75,14 +203,15 @@ const PanchayathAccordion: React.FC = () => {
                                                 </div>
                                                 <div className="absolute bottom-0 left-0 p-3 text-white">
                                                     <h3 className="font-bold text-sm">{video.name}</h3>
-                                                    <p className="text-xs">Age {video.age}, {video.location}</p>
+                                                    <p className="text-xs">{video.wardLabel}{video.wardLabel ? ', ' : ''}{video.panchayath}</p>
                                                 </div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
-                            ) : (
-                                <p className="text-gray-500 text-center py-4">No videos available for this panchayath.</p>
+                            )}
+                            {!item.loading && !item.error && item.videos.length === 0 && (
+                                <p className="text-gray-500 text-center py-4">No videos available for this block.</p>
                             )}
                         </div>
                     </div>

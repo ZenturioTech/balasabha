@@ -1,15 +1,40 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { supabase } from '../services/supabaseClient';
 
-const spotlightVideos = [
-    { seed: 'vid1', name: 'Bhargav S', age: 18, location: 'Cherunniyoor', district: 'Trivandrum' },
-    { seed: 'vid2', name: 'Neha N', age: 18, location: 'Cherunniyoor', district: 'Trivandrum' },
-    { seed: 'vid3', name: 'Adithya V', age: 17, location: 'Varkala', district: 'Trivandrum' },
-    { seed: 'vid4', name: 'Sreya P', age: 16, location: 'Kollam', district: 'Kollam' },
-    { seed: 'vid5', name: 'Rahul K', age: 18, location: 'Kottarakkara', district: 'Kollam' },
-    { seed: 'vid6', name: 'Anjali M', age: 15, location: 'Chirayinkeezhu', district: 'Trivandrum' },
-    { seed: 'vid7', name: 'Vivek G', age: 17, location: 'Neyyattinkara', district: 'Trivandrum' },
-    { seed: 'vid8', name: 'Hanna S', age: 16, location: 'Nedumangad', district: 'Trivandrum' },
-];
+type RawMetadata = {
+    name?: string;
+    district?: string;
+    block?: string;
+    panchayath?: string;
+    ward?: string | number;
+    mediaType?: string;
+    thumbnailUrl?: string;
+    videoUrl?: string;
+    createdAt?: string;
+};
+
+type MetadataRow = {
+    id: number;
+    created_at: string;
+    metadata: RawMetadata | null;
+    district: string | null;
+    username: string | null;
+    block_ulb: string | null;
+    panchayath: string | null;
+};
+
+type SpotlightVideo = {
+    id: string;
+    name: string;
+    district: string;
+    panchayath: string;
+    wardLabel: string;
+    thumbnailUrl: string;
+    videoUrl: string;
+};
+
+const MOBILE_TILE_COUNT = 8;
+const DESKTOP_TILE_COUNT = 16;
 
 const districts = [
     'Trivandrum', 'Kollam', 'Alappuzha', 'Kottayam', 'Idukki', 'Ernakulam', 'Thrissur', 'Palakkad',
@@ -18,20 +43,20 @@ const districts = [
 
 const districtImages = [
     '/images/sree-padmanabhaswamy.jpg',      // Trivandrum
-    '/images/kollam.jpg',          // Kollam
-    '/images/ambalapuzha-sree-krishna.jpg',       // Alappuzha
-    '/images/scenic-paradise.jpg',        // Kottayam
-    '/images/ajin.jpg',          // Idukki
-    '/images/ekm.jpg',       // Ernakulam
-    '/images/Kudamatom_at_thrissur_pooram.webp',        // Thrissur
-    '/images/malampuzha-garden-and.jpg',        // Palakkad
-    '/images/thirumandhamkunnu-bhagavathy.jpg',      // Malappuram
-    '/images/caption.jpg',       // Kozhikode
-    '/images/Kandanar_Kelan_Theyyam_kannur.jpg',          // Kannur
-    '/images/edakkal-caves.jpg',         // Wayanad
-    '/images/bekal-fort.jpg',       // Kasaragod
-    '/images/photo8jpg.jpg',  // Pathanamthitta
-    '/images/INS_Vikrant_under_construction_at_Cochin_Shipyard.png'            // Urban Localbodies
+    'https://i.ibb.co/6rPqN6B/kollam.jpg',          // Kollam
+    'https://i.ibb.co/2d7F2V9/alappuzha.jpg',       // Alappuzha
+    'https://i.ibb.co/yqg6fVd/kottayam.jpg',        // Kottayam
+    'https://i.ibb.co/RjF7d7d/idukki.jpg',          // Idukki
+    'https://i.ibb.co/3Yx4BfM/ernakulam.jpg',       // Ernakulam
+    'https://i.ibb.co/bFmdhMD/thrissur.jpg',        // Thrissur
+    'https://i.ibb.co/gDHJgTQ/palakkad.jpg',        // Palakkad
+    'https://i.ibb.co/ZJ0D0hB/malappuram.jpg',      // Malappuram
+    'https://i.ibb.co/N1gQWfH/kozhikode.jpg',       // Kozhikode
+    'https://i.ibb.co/yY1kH1B/kannur.jpg',          // Kannur
+    'https://i.ibb.co/qD4kXfJ/wayanad.jpg',         // Wayanad
+    'https://i.ibb.co/v4h9d9k/kasaragod.jpg',       // Kasaragod
+    'https://i.ibb.co/K2K76rW/pathanamthitta.jpg',  // Pathanamthitta
+    'https://i.ibb.co/n1nN1Yy/urban.jpg'            // Urban Localbodies
 ];
 
 // A comprehensive list of Kerala's Local Self Government Institutions
@@ -74,6 +99,14 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const searchContainerRef = useRef<HTMLDivElement>(null);
 
+    const [allVideos, setAllVideos] = useState<SpotlightVideo[]>([]);
+    const [displayVideos, setDisplayVideos] = useState<SpotlightVideo[]>([]);
+    const [selectedVideo, setSelectedVideo] = useState<SpotlightVideo | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isModalClosing, setIsModalClosing] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
     const toggleViews = () => {
         setShowDistricts(prevState => !prevState);
         if (interactiveSectionRef.current) {
@@ -109,10 +142,149 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const desktopCols: (typeof spotlightVideos)[] = [[], [], [], []];
-    spotlightVideos.forEach((video, index) => {
+    useEffect(() => {
+        const fetchVideos = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                // Debug: starting fetch
+                // eslint-disable-next-line no-console
+                console.log('[Spotlight] Starting fetch from Supabase metadata...');
+                let { data, error: fetchError } = await supabase
+                    .from('metadata')
+                    .select('id, created_at, metadata, district, username, block_ulb, panchayath')
+                    .limit(100);
+
+                // Debug: raw response
+                // eslint-disable-next-line no-console
+                console.log('[Spotlight] Supabase response', { error: fetchError, rows: data?.length, sample: data?.[0] });
+
+                if (fetchError) {
+                    throw fetchError;
+                }
+
+                if (!data || data.length === 0) {
+                    // Debug: fallback fetch without filter to inspect rows
+                    // eslint-disable-next-line no-console
+                    console.log('[Spotlight] No rows matched filter. Fetching unfiltered sample to inspect...');
+                    const { data: fallbackData, error: fbErr } = await supabase
+                        .from('metadata')
+                        .select('id, created_at, metadata, district, username, block_ulb, panchayath')
+                        .order('created_at', { ascending: false })
+                        .limit(10);
+                    // eslint-disable-next-line no-console
+                    console.log('[Spotlight] Fallback sample', { error: fbErr, rows: fallbackData?.length, firstMeta: fallbackData?.[0]?.metadata });
+                    data = fallbackData ?? [];
+                }
+
+                const mapped: SpotlightVideo[] = (data as MetadataRow[])
+                    .filter((row) => {
+                        const mt = (row.metadata as any)?.mediaType;
+                        return mt && String(mt).toLowerCase() === 'video';
+                    })
+                    .map((row) => {
+                    const m = row.metadata ?? {};
+                    const district = (m.district || row.district || '').toString();
+                    const panch = (m.panchayath || row.panchayath || '').toString();
+                    const wardRaw = m.ward ?? '';
+                    const wardLabel = wardRaw ? `Ward ${wardRaw}` : '';
+                    return {
+                        id: String(row.id),
+                        name: (m.name || row.username || 'Participant').toString(),
+                        district,
+                        panchayath: panch,
+                        wardLabel,
+                        thumbnailUrl: (m.thumbnailUrl || '/images/girlw.png').toString(),
+                        videoUrl: (m.videoUrl || '').toString(),
+                    };
+                }).filter(v => v.videoUrl);
+
+                // Debug: mapped videos
+                // eslint-disable-next-line no-console
+                console.log('[Spotlight] Mapped videos count', mapped.length, mapped.slice(0, 3));
+
+                setAllVideos(mapped);
+            } catch (e: any) {
+                setError(e?.message || 'Failed to load videos');
+                // Debug: error during fetch
+                // eslint-disable-next-line no-console
+                console.error('[Spotlight] Fetch error', e);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchVideos();
+    }, []);
+
+    const buildRandomizedList = (source: SpotlightVideo[], desiredCount: number): SpotlightVideo[] => {
+        if (source.length === 0) return [];
+        const shuffled = [...source].sort(() => Math.random() - 0.5);
+        if (shuffled.length >= desiredCount) {
+            return shuffled.slice(0, desiredCount);
+        }
+        const result: SpotlightVideo[] = [];
+        let i = 0;
+        while (result.length < desiredCount) {
+            result.push(shuffled[i % shuffled.length]);
+            i += 1;
+        }
+        return result;
+    };
+
+    useEffect(() => {
+        if (allVideos.length === 0) {
+            setDisplayVideos([]);
+            return;
+        }
+        const isDesktop = typeof window !== 'undefined' ? window.innerWidth >= 1024 : true;
+        const count = isDesktop ? DESKTOP_TILE_COUNT : MOBILE_TILE_COUNT;
+        // Debug: build list initial
+        // eslint-disable-next-line no-console
+        console.log('[Spotlight] Building display list', { total: allVideos.length, isDesktop, count });
+        setDisplayVideos(buildRandomizedList(allVideos, count));
+        // Rebuild when window resizes (simple listener)
+        const onResize = () => {
+            const nowDesktop = window.innerWidth >= 1024;
+            const nextCount = nowDesktop ? DESKTOP_TILE_COUNT : MOBILE_TILE_COUNT;
+            setDisplayVideos(buildRandomizedList(allVideos, nextCount));
+            // Debug: on resize
+            // eslint-disable-next-line no-console
+            console.log('[Spotlight] Resize rebuild', { nowDesktop, nextCount });
+        };
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, [allVideos]);
+
+    const desktopCols: SpotlightVideo[][] = [[], [], [], []];
+    displayVideos.forEach((video, index) => {
         desktopCols[index % 4].push(video);
     });
+    
+    const openModal = (video: SpotlightVideo) => {
+        setSelectedVideo(video);
+        setIsModalClosing(false);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalClosing(true);
+        // Allow transition to play before unmounting
+        window.setTimeout(() => {
+            setIsModalOpen(false);
+            setSelectedVideo(null);
+            setIsModalClosing(false);
+        }, 200);
+    };
+
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isModalOpen) {
+                closeModal();
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [isModalOpen]);
     
     return (
         <section id="interactive-section" ref={interactiveSectionRef} className="pt-8 md:pt-16 pb-8 px-6 text-center">
@@ -121,12 +293,21 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                 <h2 className="text-3xl md:text-6xl font-bold text-teal-600  mb-12 font-serif">Dream Vibes Spotlight</h2>
                 
                 <div className="max-w-6xl mx-auto">
+                    {error && (
+                        <div className="text-red-600 mb-6">{error}</div>
+                    )}
+                    {loading && (
+                        <div className="text-gray-600 mb-6">Loading videos...</div>
+                    )}
+                    {!loading && !error && displayVideos.length === 0 && (
+                        <div className="text-gray-600 mb-6">No videos available. Check console for details.</div>
+                    )}
                     {/* Mobile & Tablet view - default grid */}
                     <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:hidden ">
-                        {spotlightVideos.map((video) => (
-                            <div key={video.seed} className="group relative">
+                        {displayVideos.map((video) => (
+                            <div key={video.id} className="group relative" onClick={() => openModal(video)}>
                                 <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg">
-                                    <img src={`https://picsum.photos/seed/${video.seed}/300/500`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Spotlight video thumbnail" />
+                                    <img src={video.thumbnailUrl} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Spotlight video thumbnail" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-teal-800/80 via-transparent to-black/20"></div>
                                     <div className="absolute top-3 left-3 flex items-center gap-1 text-white text-xs bg-black/30 px-2 py-1 rounded-full">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
@@ -139,7 +320,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                                     </div>
                                     <div className="absolute bottom-0 left-0 p-4 text-white">
                                         <h3 className="font-bold">{video.name}</h3>
-                                        <p className="text-xs">Age {video.age}, {video.location}</p>
+                                        <p className="text-xs">{video.wardLabel}{video.wardLabel ? ', ' : ''}{video.panchayath}</p>
                                     </div>
                                 </div>
                             </div>
@@ -151,9 +332,14 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                         {desktopCols.map((col, colIndex) => (
                             <div key={colIndex} className={`w-1/4 flex flex-col gap-y-10 ${colIndex % 2 !== 0 ? 'mt-16' : ''}`}>
                                 {col.map((video) => (
-                                    <div key={video.seed} className="group relative">
+                                    <div key={video.id} className="group relative" onClick={() => {
+                                        // Debug: opening modal
+                                        // eslint-disable-next-line no-console
+                    console.log('[Spotlight] Open modal for video', video);
+                                        openModal(video);
+                                    }}>
                                         <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg">
-                                            <img src={`https://picsum.photos/seed/${video.seed}/300/500`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Spotlight video thumbnail" />
+                                            <img src={video.thumbnailUrl} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Spotlight video thumbnail" />
                                             <div className="absolute inset-0 bg-gradient-to-t from-teal-800/80 via-transparent to-black/20"></div>
                                             <div className="absolute top-3 left-3 flex items-center gap-1 text-white text-xs bg-black/30 px-2 py-1 rounded-full">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
@@ -166,7 +352,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                                             </div>
                                             <div className="absolute bottom-0 left-0 p-4 text-white">
                                                 <h3 className="font-bold">{video.name}</h3>
-                                                <p className="text-xs">Age {video.age}, {video.location}</p>
+                                                <p className="text-xs">{video.wardLabel}{video.wardLabel ? ', ' : ''}{video.panchayath}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -227,6 +413,35 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                 </div>
                 <button id="back-to-spotlight-btn" onClick={toggleViews} className="mt-12 text-teal-600 font-bold hover:text-teal-800 transition-colors">{'<< Back to Spotlight'}</button>
             </div>
+
+            {/* Video Modal */}
+            {isModalOpen && selectedVideo && (
+                <div 
+                    className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-colors duration-200 ${isModalClosing ? 'bg-black/0' : 'bg-black/70'}`}
+                    onClick={closeModal}
+                >
+                    <div 
+                        className={`bg-white rounded-2xl md:rounded-3xl overflow-hidden max-w-4xl w-full relative transition-all duration-200 ${isModalClosing ? 'opacity-0 scale-95 translate-y-2' : 'opacity-100 scale-100 translate-y-0'} md:h-[90vh] max-h-screen flex flex-col`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button type="button" aria-label="Close" className="absolute z-20 top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full w-10 h-10 flex items-center justify-center text-3xl leading-none" onClick={closeModal}>
+                            <span className="-mt-2" aria-hidden>
+                                ×
+                            </span>
+                        </button>
+                        <div className="w-full bg-black flex-1 flex items-center justify-center">
+                            <video controls preload="metadata" poster={selectedVideo.thumbnailUrl} className="max-w-full max-h-full w-auto h-auto object-contain">
+                                <source src={selectedVideo.videoUrl} />
+                            </video>
+                        </div>
+                        <div className="p-4 sm:p-5 bg-white/15 backdrop-blur-md text-black" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                        <div className="font-semibold text-xl sm:text-xl">{selectedVideo.name}</div>
+                            <div className="text-sm sm:text-base opacity-90">{selectedVideo.district}</div>
+                            <div className="text-sm sm:text-base opacity-95">{selectedVideo.wardLabel}{selectedVideo.wardLabel ? ', ' : ''}{selectedVideo.panchayath}</div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 }

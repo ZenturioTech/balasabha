@@ -57,7 +57,7 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
             <main className="py-16 px-4">
                 {/* Panchayath Accordion Section */}
                 <section className="max-w-3xl mx-auto">
-                    <PanchayathAccordion />
+                    <PanchayathAccordion districtName={districtName === 'Urban Localbodies' ? 'Urban Localbodies' : districtName} />
                 </section>
             </main>
 

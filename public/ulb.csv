@@ -1,0 +1,94 @@
+SlNo,ULB,ULB Type,District
+1,Thiruvananthapuram,Municipal Corporation,Thiruvananthapuram
+2,Kollam,Municipal Corporation,Kollam
+3,Kochi,Municipal Corporation,Ernakulam
+4,Thrissur,Municipal Corporation,Thrissur
+5,Kozhikode,Municipal Corporation,Kozhikode
+6,Kannur,Municipal Corporation,Kannur
+1,Alappuzha,Municipality,Alappuzha
+2,Chengannur,Municipality,Alappuzha
+3,Cherthala,Municipality,Alappuzha
+4,Haripad,Municipality,Alappuzha
+5,Kayamkulam,Municipality,Alappuzha
+6,Mavelikkara,Municipality,Alappuzha
+7,Aluva,Municipality,Ernakulam
+8,Angamaly,Municipality,Ernakulam
+9,Eloor,Municipality,Ernakulam
+10,Kalamassery,Municipality,Ernakulam
+11,Koothattukulam,Municipality,Ernakulam
+12,Kothamangalam,Municipality,Ernakulam
+13,Maradu,Municipality,Ernakulam
+14,Muvattupuzha,Municipality,Ernakulam
+15,Paravur,Municipality,Ernakulam
+16,Perumbavoor,Municipality,Ernakulam
+17,Piravom,Municipality,Ernakulam
+18,Thrikkakara,Municipality,Ernakulam
+19,Thrippunithura,Municipality,Ernakulam
+20,Thodupuzha,Municipality,idukki
+21,Anthoor,Municipality,Kannur
+22,Iritty,Municipality,Kannur
+23,Koothuparamba,Municipality,Kannur
+24,Mattannur,Municipality,Kannur
+25,Panoor,Municipality,Kannur
+26,Payyannur,Municipality,Kannur
+27,Sreekandapuram,Municipality,Kannur
+28,Taliparamba,Municipality,Kannur
+29,Thalassery,Municipality,Kannur
+30,Kanhangad,Municipality,Kasaragod
+31,Kasaragod,Municipality,Kasaragod
+32,Nileshwar,Municipality,Kasaragod
+33,Karunagappally,Municipality,Kollam
+34,Kottarakara,Municipality,Kollam
+35,Paravoor,Municipality,Kollam
+36,Punalur,Municipality,Kollam
+37,Changanassery,Municipality,Kottayam
+38,Erattupetta,Municipality,Kottayam
+39,Ettumanoor,Municipality,Kottayam
+40,Kottayam,Municipality,Kottayam
+41,Palai,Municipality,Kottayam
+42,Vaikom,Municipality,Kottayam
+43,Feroke,Municipality,Kozhikkode
+44,Koduvally,Municipality,Kozhikkode
+45,koyilandy,Municipality,Kozhikkode
+46,Mukkam,Municipality,Kozhikkode
+47,Payyoli,Municipality,Kozhikkode
+48,Ramanattukara,Municipality,Kozhikkode
+49,Vatakara,Municipality,Kozhikkode
+50,Kondotty,Municipality,Malappuram
+51,Kottakkal,Municipality,Malappuram
+52,Malappuram,Municipality,Malappuram
+53,Manjeri,Municipality,Malappuram
+54,Nilambur,Municipality,Malappuram
+55,Parappanangadi,Municipality,Malappuram
+56,Perinthalmanna,Municipality,Malappuram
+57,Ponnani,Municipality,Malappuram
+58,Tanur,Municipality,Malappuram
+59,Tirur,Municipality,Malappuram
+60,Tirurangadi,Municipality,Malappuram
+61,Valanchery,Municipality,Malappuram
+62,Cherpulassery,Municipality,Palakkad
+63,Chittur-Thathamangalam,Municipality,Palakkad
+64,Mannarkad,Municipality,Palakkad
+65,Ottappalam,Municipality,Palakkad
+66,Palakkad,Municipality,Palakkad
+67,Pattambi,Municipality,Palakkad
+68,Shoranur,Municipality,Palakkad
+69,Adoor,Municipality,Pathanamthitta
+70,Pandalam,Municipality,Pathanamthitta
+71,Pathanamthitta,Municipality,Pathanamthitta
+72,Thiruvalla,Municipality,Pathanamthitta
+73,Attingal,Municipality,Thiruvananthapuram
+74,Nedumangad,Municipality,Thiruvananthapuram
+75,Neyyattinkara,Municipality,Thiruvananthapuram
+76,Varkala,Municipality,Thiruvananthapuram
+77,Chalakudy,Municipality,Thrissur
+78,Chavakkad,Municipality,Thrissur
+79,Guruvayoor,Municipality,Thrissur
+80,Irinjalakuda,Municipality,Thrissur
+81,Kodungallur,Municipality,Thrissur
+82,Kunnamkulam,Municipality,Thrissur
+83,Wadakanchery,Municipality,Thrissur
+84,Kalpetta,Municipality,Wayanad
+85,Kattappana,Municipality,Wayanad
+86,Mananthavady,Municipality,Wayanad
+87,Sulthan Bathery,Municipality,Wayanad
