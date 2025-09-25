@@ -16,6 +16,24 @@ const districts = [
     'Malappuram', 'Kozhikode', 'Kannur', 'Wayanad', 'Kasaragod', 'Pathanamthitta', 'Urban Localbodies'
 ];
 
+const districtImages = [
+    '/images/sree-padmanabhaswamy.jpg',      // Trivandrum
+    'https://i.ibb.co/6rPqN6B/kollam.jpg',          // Kollam
+    'https://i.ibb.co/2d7F2V9/alappuzha.jpg',       // Alappuzha
+    'https://i.ibb.co/yqg6fVd/kottayam.jpg',        // Kottayam
+    'https://i.ibb.co/RjF7d7d/idukki.jpg',          // Idukki
+    'https://i.ibb.co/3Yx4BfM/ernakulam.jpg',       // Ernakulam
+    'https://i.ibb.co/bFmdhMD/thrissur.jpg',        // Thrissur
+    'https://i.ibb.co/gDHJgTQ/palakkad.jpg',        // Palakkad
+    'https://i.ibb.co/ZJ0D0hB/malappuram.jpg',      // Malappuram
+    'https://i.ibb.co/N1gQWfH/kozhikode.jpg',       // Kozhikode
+    'https://i.ibb.co/yY1kH1B/kannur.jpg',          // Kannur
+    'https://i.ibb.co/qD4kXfJ/wayanad.jpg',         // Wayanad
+    'https://i.ibb.co/v4h9d9k/kasaragod.jpg',       // Kasaragod
+    'https://i.ibb.co/K2K76rW/pathanamthitta.jpg',  // Pathanamthitta
+    'https://i.ibb.co/n1nN1Yy/urban.jpg'            // Urban Localbodies
+];
+
 // A comprehensive list of Kerala's Local Self Government Institutions
 const keralaLocations = [
     // Corporations
@@ -45,7 +63,7 @@ const keralaLocations = [
 ];
 
 interface SpotlightProps {
-    onSelectDistrict: (districtName: string) => void;
+    onSelectDistrict: (districtName: string, imageUrl: string) => void;
 }
 
 const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
@@ -158,7 +176,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                     </div>
                 </div>
 
-                <button id="view-all-btn" onClick={toggleViews} className="mt-16 md:text-3xl text-teal-600 font-bold hover:text-teal-800 transition-colors text-lg">View all</button>
+                <button id="view-all-btn" onClick={toggleViews} className="mt-16 md:text-3xl text-teal-600 font-bold hover:text-teal-800 transition-colors text-lg">View all </button>
             </div>
 
             {/* District Search View */}
@@ -192,16 +210,15 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                     )}
                 </div>
                 <div className="grid grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto">
-                    {districts.map(district => {
+                    {districts.map((district, index) => {
                         const districtName = district.replace('<br>', ' ');
-                        const districtSeed = district.replace('<br>', '');
                         return (
                             <div 
                                 key={district} 
                                 className="group relative aspect-[3/4] rounded-3xl shadow-lg overflow-hidden cursor-pointer text-white font-bold text-sm md:text-lg flex items-end justify-center text-center"
-                                onClick={() => onSelectDistrict(districtName)}
+                                onClick={() => onSelectDistrict(districtName, districtImages[index])}
                             >
-                                <img src={`https://picsum.photos/seed/${districtSeed}/300/400`} className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt={districtName} />
+                                <img src={districtImages[index]} className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt={districtName} />
                                 <div className="absolute inset-0 bg-gradient-to-t from-teal-700/80 via-transparent to-transparent"></div>
                                 <span className="relative z-10 pb-2 sm:pb-4 px-2" dangerouslySetInnerHTML={{ __html: district }}></span>
                             </div>

@@ -4,11 +4,11 @@ import PanchayathAccordion from './PanchayathAccordion';
 
 interface DistrictPageProps {
     districtName: string;
+    imageUrl: string;
     onBack: () => void;
 }
 
-const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, onBack }) => {
-    const districtImageSeed = districtName.replace(/\s+/g, '');
+const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onBack }) => {
 
     return (
         <div className="bg-white">
@@ -16,7 +16,7 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, onBack }) => 
             <header className="relative h-[65vh] w-full flex flex-col items-center justify-end text-white text-center p-4 pb-20">
                 <div className="absolute inset-0 z-0">
                     <img 
-                        src={`https://picsum.photos/seed/${districtImageSeed}/1920/1080`} 
+                        src={imageUrl} 
                         alt={`${districtName} landscape`} 
                         className="w-full h-full object-cover" 
                     />
@@ -38,7 +38,7 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, onBack }) => 
 
                 <div className="relative z-10 flex flex-col items-center gap-8 w-full max-w-3xl">
                     <h1 className="text-5xl md:text-7xl font-bold font-serif" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.7)' }}>
-                        {districtName === 'Municipal Corporations' ? 'Municipal Corporations' : `${districtName} District`}
+                        {districtName === 'Urban Localbodies' ? 'Urban Localbodies' : `${districtName} District`}
                     </h1>
                     <div className="relative w-full mt-4">
                         <input 

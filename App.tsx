@@ -15,11 +15,16 @@ const Divider: React.FC = () => (
     </div>
 );
 
-const App: React.FC = () => {
-    const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
+interface SelectedDistrict {
+    name: string;
+    imageUrl: string;
+}
 
-    const handleSelectDistrict = (districtName: string) => {
-        setSelectedDistrict(districtName);
+const App: React.FC = () => {
+    const [selectedDistrict, setSelectedDistrict] = useState<SelectedDistrict | null>(null);
+
+    const handleSelectDistrict = (districtName: string, imageUrl: string) => {
+        setSelectedDistrict({ name: districtName, imageUrl });
         window.scrollTo(0, 0); // Scroll to top on page change
     };
 
@@ -28,7 +33,7 @@ const App: React.FC = () => {
     };
 
     if (selectedDistrict) {
-        return <DistrictPage districtName={selectedDistrict} onBack={handleGoHome} />;
+        return <DistrictPage districtName={selectedDistrict.name} imageUrl={selectedDistrict.imageUrl} onBack={handleGoHome} />;
     }
 
     return (
