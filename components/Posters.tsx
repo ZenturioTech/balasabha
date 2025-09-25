@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 
 const posterData = [
   { id: 1, src: '/images/bsp (1).jpeg', alt: 'Dream Vibes poster with illustrations of children' },
-  { id: 2, src: 'public/images/bsp (2).jpeg', alt: 'Dream Vibes poster with claymation children' },
-  { id: 3, src: 'public/images/bsp (3).jpeg', alt: 'Dream Vibes poster with children reading outdoors' },
-  { id: 4, src: 'public/images/bsp (4).jpeg', alt: 'Dream Vibes poster with illustrations of children' },
-  { id: 5, src: 'public/images/bsp (2).jpeg', alt: 'Dream Vibes poster with claymation children' },
-  { id: 6, src: 'public/images/bsp (3).jpeg', alt: 'Dream Vibes poster with children reading outdoors' },
+  { id: 2, src: 'images/bsp (2).jpeg', alt: 'Dream Vibes poster with claymation children' },
+  { id: 3, src: '/images/bsp (3).jpeg', alt: 'Dream Vibes poster with children reading outdoors' },
+  { id: 4, src: '/images/bsp (4).jpeg', alt: 'Dream Vibes poster with illustrations of children' },
+  { id: 5, src: '/images/bsp (2).jpeg', alt: 'Dream Vibes poster with claymation children' },
+  { id: 6, src: '/images/bsp (3).jpeg', alt: 'Dream Vibes poster with children reading outdoors' },
 ];
 
 const Posters: React.FC = () => {

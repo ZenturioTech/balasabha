@@ -5,16 +5,16 @@ const Hero: React.FC = () => {
         <section className="relative h-[70vh] sm:h-[85vh] w-full text-white overflow-hidden shadow-lg">
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
-                <img src="public/images/hawaii-beach-landscape-with-nature-coastline.jpg" alt="Coastal landscape at sunset" className="w-full h-full object-cover" />
+                <img src="/images/hawaii-beach-landscape-with-nature-coastline.jpg" alt="Coastal landscape at sunset" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/30"></div>
             </div>
 
             {/* Header Bar */}
             <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-30 w-[90%] max-w-3xl">
                 <div className="bg-white rounded-full shadow-lg px-4 sm:px-6 py-2 flex items-center justify-between">
-                    <img src="public/images/kerala final emblem_0.jpg" alt="Kerala Government Emblem" className="h-8 sm:h-10" />
-                    <img src="public/images/Layer 2 copy (1).png" alt="Dream Vibes Logo" className="h-10 sm:h-12" />
-                    <img src="public/images/Kudumbasree-Logo-Vector.svg-.png" alt="Balasabha Logo" className="h-8 sm:h-10" />
+                    <img src="/images/kerala final emblem_0.jpg" alt="Kerala Government Emblem" className="h-8 sm:h-10" />
+                    <img src="/images/Layer 2 copy (1).png" alt="Dream Vibes Logo" className="h-10 sm:h-12" />
+                    <img src="/images/Kudumbasree-Logo-Vector.svg-.png" alt="Balasabha Logo" className="h-8 sm:h-10" />
                 </div>
             </header>
 

@@ -15,23 +15,23 @@ const About: React.FC = () => {
                     {/* Left Icons Column */}
                     <div className="flex flex-col gap-8 md:gap-16">
                         <div className="w-20 h-20 md:w-28 md:h-28">
-                           <img src="public/images/cicons (1).png" alt="Community Growth Icon" className="w-full h-full object-contain" />
+                           <img src="/images/cicons (1).png" alt="Community Growth Icon" className="w-full h-full object-contain" />
                         </div>
                         <div className="w-20 h-20 md:w-28 md:h-28">
-                           <img src="public/images/cicons (2).png" alt="Critical Thinking Icon" className="w-full h-full object-contain" />
+                           <img src="/images/cicons (2).png" alt="Critical Thinking Icon" className="w-full h-full object-contain" />
                         </div>
                     </div>
                     
                     {/* Central Image */}
-                    <img src="public/images/girlw.png" alt="Girl with a lightbulb idea" className="w-48 sm:w-56 md:w-72 h-auto" />
+                    <img src="/images/girlw.png" alt="Girl with a lightbulb idea" className="w-48 sm:w-56 md:w-72 h-auto" />
                     
                     {/* Right Icons Column */}
                     <div className="flex flex-col gap-8 md:gap-16">
                         <div className="w-20 h-20 md:w-28 md:h-28">
-                           <img src="public/images/cicons (3).png" alt="Local Institutions Icon" className="w-full h-full object-contain" />
+                           <img src="/images/cicons (3).png" alt="Local Institutions Icon" className="w-full h-full object-contain" />
                         </div>
                         <div className="w-20 h-20 md:w-28 md:h-28">
-                            <img src="public/images/cicons (4).png" alt="Social Awareness Icon" className="w-full h-full object-contain" />
+                            <img src="/images/cicons (4).png" alt="Social Awareness Icon" className="w-full h-full object-contain" />
                         </div>
                     </div>
                 </div>
