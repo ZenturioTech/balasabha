@@ -13,7 +13,7 @@ const spotlightVideos = [
 
 const districts = [
     'Trivandrum', 'Kollam', 'Alappuzha', 'Kottayam', 'Idukki', 'Ernakulam', 'Thrissur', 'Palakkad',
-    'Malappuram', 'Kozhikode', 'Kannur', 'Wayanad', 'Kasaragod', 'Pathanamthitta', 'Municipal<br>Corporations'
+    'Malappuram', 'Kozhikode', 'Kannur', 'Wayanad', 'Kasaragod', 'Pathanamthitta', 'Urban Localbodies'
 ];
 
 // A comprehensive list of Kerala's Local Self Government Institutions
@@ -158,7 +158,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                     </div>
                 </div>
 
-                <button id="view-all-btn" onClick={toggleViews} className="mt-16 text-teal-600 font-bold hover:text-teal-800 transition-colors text-lg">View all </button>
+                <button id="view-all-btn" onClick={toggleViews} className="mt-16 md:text-3xl text-teal-600 font-bold hover:text-teal-800 transition-colors text-lg">View all</button>
             </div>
 
             {/* District Search View */}
@@ -198,12 +198,12 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                         return (
                             <div 
                                 key={district} 
-                                className="group relative aspect-[3/4] rounded-3xl shadow-lg overflow-hidden cursor-pointer text-white font-bold text-lg flex items-end justify-center text-center"
+                                className="group relative aspect-[3/4] rounded-3xl shadow-lg overflow-hidden cursor-pointer text-white font-bold text-sm md:text-lg flex items-end justify-center text-center"
                                 onClick={() => onSelectDistrict(districtName)}
                             >
                                 <img src={`https://picsum.photos/seed/${districtSeed}/300/400`} className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt={districtName} />
                                 <div className="absolute inset-0 bg-gradient-to-t from-teal-700/80 via-transparent to-transparent"></div>
-                                <span className="relative z-10 pb-4 px-2" dangerouslySetInnerHTML={{ __html: district }}></span>
+                                <span className="relative z-10 pb-2 sm:pb-4 px-2" dangerouslySetInnerHTML={{ __html: district }}></span>
                             </div>
                         )
                     })}
