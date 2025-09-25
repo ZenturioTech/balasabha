@@ -158,24 +158,22 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                     </div>
                 </div>
 
-                <button id="view-all-btn" onClick={toggleViews} className="mt-16 text-teal-600 font-bold hover:text-teal-800 transition-colors text-lg">View all</button>
+                <button id="view-all-btn" onClick={toggleViews} className="mt-16 text-teal-600 font-bold hover:text-teal-800 transition-colors text-lg">View all </button>
             </div>
 
             {/* District Search View */}
             <div id="district-search-container" className={!showDistricts ? 'hidden' : ''}>
                 <div className="relative max-w-xl mx-auto mb-12" ref={searchContainerRef}>
-                     <div className="flex items-center w-full gap-2 sm:gap-4">
-                        <input
-                            type="text"
-                            placeholder="Search Panchayath/Block/Municipality/Corporation"
-                            className="flex-grow w-full bg-transparent border-2 border-black border-b-0 rounded-t-full focus:outline-none focus:ring-0 text-gray-700 placeholder-gray-500 text-[11px] sm:text-sm md:text-base px-4 py-3"
+                     <div className="relative flex items-center w-full">
+                        <input 
+                            type="text" 
+                            placeholder="Search Panchayath/Block/Municipality/Corporation" 
+                            className="w-full text-sm sm:text-base pl-4 sm:pl-6 pr-24 sm:pr-32 py-3 sm:py-4 text-gray-700 bg-white border-2 border-gray-200 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder-gray-500"
                             value={searchQuery}
                             onChange={handleInputChange}
                             onFocus={handleInputChange}
-                        />
-                        <button className="flex-shrink-0 bg-teal-500 text-white font-semibold rounded-full hover:bg-teal-600 transition-colors shadow-md text-sm sm:text-base py-3 px-6 sm:px-8">
-                            Search
-                        </button>
+                         />
+                        <button className="absolute right-2 bg-teal-500 text-white font-semibold text-sm sm:text-base py-2 px-4 sm:py-3 sm:px-8 rounded-full hover:bg-teal-600 transition-colors shadow-md">Search</button>
                     </div>
                     {suggestions.length > 0 && (
                         <div className="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
