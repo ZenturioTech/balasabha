@@ -97,7 +97,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
     });
     
     return (
-        <section id="interactive-section" ref={interactiveSectionRef} className="pt-12 sm:pt-16 pb-8 px-6 text-center">
+        <section id="interactive-section" ref={interactiveSectionRef} className="pt-8 md:pt-16 pb-8 px-6 text-center">
             {/* Spotlight View */}
             <div id="spotlight-container" className={showDistricts ? 'hidden' : ''}>
                 <h2 className="text-3xl md:text-6xl font-bold text-teal-600  mb-12 font-serif">Dream Vibes Spotlight</h2>
@@ -168,7 +168,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                         <input 
                             type="text" 
                             placeholder="Search Panchayath/Block/Municipality/Corporation" 
-                            className="w-full text-sm sm:text-base pl-4 sm:pl-6 pr-24 sm:pr-32 py-3 sm:py-4 text-gray-700 bg-white border-2 border-gray-200 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder-gray-500"
+                            className="w-full text-sm sm:text-base pl-4 sm:pl-6 pr-24 sm:pr-32 py-3 sm:py-4 text-gray-700 bg-white border-2 border-gray-200 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder-gray-500 placeholder:text-xs sm:placeholder:text-sm"
                             value={searchQuery}
                             onChange={handleInputChange}
                             onFocus={handleInputChange}
