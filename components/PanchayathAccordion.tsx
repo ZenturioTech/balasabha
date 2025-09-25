@@ -19,6 +19,11 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
+    // Modal state for video playback
+    const [selectedVideo, setSelectedVideo] = useState<any | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isModalClosing, setIsModalClosing] = useState<boolean>(false);
+
     useEffect(() => {
         let cancelled = false;
         const loadCsv = async () => {
@@ -142,6 +147,29 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
         }
     };
 
+    const openModal = (video: any) => {
+        setSelectedVideo(video);
+        setIsModalClosing(false);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalClosing(true);
+        window.setTimeout(() => {
+            setIsModalOpen(false);
+            setSelectedVideo(null);
+            setIsModalClosing(false);
+        }, 200);
+    };
+
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isModalOpen) closeModal();
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [isModalOpen]);
+
     return (
         <div className="space-y-2">
             {loading && (
@@ -192,7 +220,7 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
                             {!item.loading && !item.error && item.videos.length > 0 && (
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                     {item.videos.map(video => (
-                                        <div key={video.id} className="group relative">
+                                        <div key={video.id} className="group relative" onClick={() => openModal(video)}>
                                             <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg bg-white">
                                                 <img src={video.thumbnailUrl} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Video thumbnail" />
                                                 <div className="absolute inset-0 bg-gradient-to-t from-teal-800/80 via-transparent to-black/20"></div>
@@ -217,6 +245,32 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
                     </div>
                 </div>
             ))}
+        {/* Modal video player */}
+        {isModalOpen && selectedVideo && (
+            <div 
+                className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-colors duration-200 ${isModalClosing ? 'bg-black/0' : 'bg-black/70'}`}
+                onClick={closeModal}
+            >
+                <div 
+                    className={`bg-white rounded-2xl md:rounded-3xl overflow-hidden max-w-4xl w-full relative transition-all duration-200 ${isModalClosing ? 'opacity-0 scale-95 translate-y-2' : 'opacity-100 scale-100 translate-y-0'} md:h-[90vh] max-h-screen flex flex-col`}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <button type="button" aria-label="Close" className="absolute z-20 top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full w-10 h-10 flex items-center justify-center text-2xl leading-none" onClick={closeModal}>
+                        <span className="-mt-px" aria-hidden>×</span>
+                    </button>
+                    <div className="w-full bg-black flex-1 flex items-center justify-center">
+                        <video controls preload="metadata" poster={selectedVideo.thumbnailUrl} className="max-w-full max-h-full w-auto h-auto object-contain">
+                            <source src={selectedVideo.videoUrl} />
+                        </video>
+                    </div>
+                    <div className="p-4 sm:p-5 bg-white/15 backdrop-blur-md text-black" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                        <div className="font-semibold text-xl sm:text-xl">{selectedVideo.name}</div>
+                        <div className="text-sm sm:text-base opacity-90">{selectedVideo.district}</div>
+                        <div className="text-sm sm:text-base opacity-95">{selectedVideo.wardLabel}{selectedVideo.wardLabel ? ', ' : ''}{selectedVideo.panchayath}</div>
+                    </div>
+                </div>
+            </div>
+        )}
         </div>
     );
 };
