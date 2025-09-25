@@ -34,7 +34,7 @@ type SpotlightVideo = {
 };
 
 const MOBILE_TILE_COUNT = 8;
-const DESKTOP_TILE_COUNT = 16;
+const DESKTOP_TILE_COUNT = 8;
 
 const districts = [
     'Trivandrum', 'Kollam', 'Alappuzha', 'Kottayam', 'Idukki', 'Ernakulam', 'Thrissur', 'Palakkad',
