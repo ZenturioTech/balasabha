@@ -29,7 +29,7 @@ const Initiative: React.FC = () => {
 
                 <div
                     id="initiative-description"
-                    className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-96' : 'max-h-0'}`}
+                    className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[1000px]' : 'max-h-0'}`}
                 >
                     <div className="pt-2">
                         <p className="text-gray-600 leading-relaxed">

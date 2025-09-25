@@ -7,6 +7,7 @@ const posterData = [
   { id: 4, src: '/images/bsp (4).jpeg', alt: 'Dream Vibes poster with illustrations of children' },
   { id: 5, src: '/images/bsp (2).jpeg', alt: 'Dream Vibes poster with claymation children' },
   { id: 6, src: '/images/bsp (3).jpeg', alt: 'Dream Vibes poster with children reading outdoors' },
+   { id: 7, src: '/images/bsp (3).jpeg', alt: 'Dream Vibes poster with children reading outdoors' },
 ];
 
 const Posters: React.FC = () => {
