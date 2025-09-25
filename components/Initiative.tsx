@@ -33,7 +33,7 @@ const Initiative: React.FC = () => {
                 >
                     <div className="pt-2">
                         <p className="text-gray-600 leading-relaxed">
-                            Balasabha is a children's social forum within the Kudumbashree program in Kerala, India, designed to develop leadership skills, democratic awareness, and personal growth in children from underprivileged families. These forums meet regularly, elect leaders, and are organized into higher tiers (Balasamities and Bala panchayats) to promote social awareness, cooperative spirit, and other values through activities like talent camps and forums for children.
+                            Balasabha is a children's social forum within the Kudumbashree program in Kerala, India, designed to develop leadership skills, democratic awareness, and personal growth in children from NHG families. These forums meet regularly, elect leaders, and are organized into higher tiers (Balasamities and Bala panchayats) to promote social awareness, cooperative spirit, and other values through activities like talent camps and forums for children.
                         </p>
                     </div>
                 </div>
