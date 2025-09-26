@@ -3,17 +3,18 @@ import React from 'react';
 const Footer: React.FC = () => {
     return (
         <footer className="bg-[#b2e4e2] py-8 px-6 text-sm">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="max-w-7xl mx-auto flex flex-col items-center md:flex-row md:items-end justify-between gap-8">
                 
                 {/* Logo */}
                 <div className="flex-shrink-0">
+                     {/* The logo in the user's image has a white background box */}
                     
                          <img 
                             src="/images/Kudumbasree-Logo-Vector.svg-.png" 
                             alt="Kudumbashree Logo" 
                             className="h-20"
                         />
-                   
+                    
                 </div>
 
                 {/* Main Content: Centered */}
@@ -23,14 +24,14 @@ const Footer: React.FC = () => {
                     <p className="pt-2 text-gray-900">© Copyright 2025 Kudumbashree I All Rights Reserved</p>
                     <div className="flex justify-center gap-6 pt-1">
                         <a href="#" className="text-teal-600 hover:underline">Privacy Policy</a>
-                        <a href="#" className="text-teal-600 hover:underline">Terms & Condition</a>
+                        <a href="#" className="text-teal-600 hover:underline">Terms&condition</a>
                     </div>
                 </div>
 
                 {/* Designed By */}
                 <div className="text-center md:text-right flex-shrink-0">
                     <p className="text-teal-700">Designed & Developed by</p>
-                    <a href="#" className="text-teal-800 font-semibold hover:underline">Zenturiotech Private ltd.</a>
+                    <a href="https://zenturiotech.com/" target="_blank" rel="noopener noreferrer" className="text-teal-800 font-semibold hover:underline">Zenturiotech Private Limited</a>
                 </div>
             </div>
         </footer>
