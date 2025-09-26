@@ -43,20 +43,20 @@ const districts = [
 
 const districtImages = [
     '/images/sree-padmanabhaswamy.jpg',      // Trivandrum
-    'https://i.ibb.co/6rPqN6B/kollam.jpg',          // Kollam
-    'https://i.ibb.co/2d7F2V9/alappuzha.jpg',       // Alappuzha
-    'https://i.ibb.co/yqg6fVd/kottayam.jpg',        // Kottayam
-    'https://i.ibb.co/RjF7d7d/idukki.jpg',          // Idukki
-    'https://i.ibb.co/3Yx4BfM/ernakulam.jpg',       // Ernakulam
-    'https://i.ibb.co/bFmdhMD/thrissur.jpg',        // Thrissur
-    'https://i.ibb.co/gDHJgTQ/palakkad.jpg',        // Palakkad
-    'https://i.ibb.co/ZJ0D0hB/malappuram.jpg',      // Malappuram
-    'https://i.ibb.co/N1gQWfH/kozhikode.jpg',       // Kozhikode
-    'https://i.ibb.co/yY1kH1B/kannur.jpg',          // Kannur
-    'https://i.ibb.co/qD4kXfJ/wayanad.jpg',         // Wayanad
-    'https://i.ibb.co/v4h9d9k/kasaragod.jpg',       // Kasaragod
-    'https://i.ibb.co/K2K76rW/pathanamthitta.jpg',  // Pathanamthitta
-    'https://i.ibb.co/n1nN1Yy/urban.jpg'            // Urban Localbodies
+    '/images/kollam.jpg',          // Kollam
+    '/images/ambalapuzha-sree-krishna.jpg',       // Alappuzha
+    '/images/scenic-paradise.jpg',        // Kottayam
+    '/images/ajin.jpg',          // Idukki
+    '/images/ekm.jpg',       // Ernakulam
+    '/images/Kudamatom_at_thrissur_pooram.webp',        // Thrissur
+    '/images/malampuzha-garden-and.jpg',        // Palakkad
+    '/images/thirumandhamkunnu-bhagavathy.jpg',      // Malappuram
+    '/images/caption.jpg',       // Kozhikode
+    '/images/Kandanar_Kelan_Theyyam_kannur.jpg',          // Kannur
+    '/images/edakkal-caves.jpg',         // Wayanad
+    '/images/bekal-fort.jpg',       // Kasaragod
+    '/images/photo8jpg.jpg',  // Pathanamthitta
+    '/images/INS_Vikrant_under_construction_at_Cochin_Shipyard.png'            // Urban Localbodies
 ];
 
 // A comprehensive list of Kerala's Local Self Government Institutions
