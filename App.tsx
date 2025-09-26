@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Hero from './components/Hero';
 import About from './components/About';
 import Initiative from './components/Initiative';
@@ -25,12 +25,52 @@ const App: React.FC = () => {
 
     const handleSelectDistrict = (districtName: string, imageUrl: string) => {
         setSelectedDistrict({ name: districtName, imageUrl });
+        // Push a history state so browser back returns here
+        try {
+            const url = new URL(window.location.href);
+            url.hash = `#district=${encodeURIComponent(districtName)}`;
+            window.history.pushState({ district: districtName }, '', url.toString());
+        } catch (_) {
+            // no-op
+        }
         window.scrollTo(0, 0); // Scroll to top on page change
     };
 
     const handleGoHome = () => {
         setSelectedDistrict(null);
+        try {
+            const url = new URL(window.location.href);
+            url.hash = '#spotlight=districts';
+            window.history.pushState({}, '', url.toString());
+        } catch (_) {
+            // no-op
+        }
+        // Scroll to Spotlight grid after returning home
+        setTimeout(() => {
+            const spotlightEl = document.getElementById('spotlight');
+            if (spotlightEl) {
+                spotlightEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 0);
     };
+
+    useEffect(() => {
+        const onPopState = (ev: PopStateEvent) => {
+            const state = ev.state as any;
+            if (!state || !state.district) {
+                // Return to home view
+                setSelectedDistrict(null);
+                return;
+            }
+            // Restore district if needed
+            const district = String(state.district);
+            if (!selectedDistrict || selectedDistrict.name !== district) {
+                setSelectedDistrict({ name: district, imageUrl: '' });
+            }
+        };
+        window.addEventListener('popstate', onPopState);
+        return () => window.removeEventListener('popstate', onPopState);
+    }, [selectedDistrict]);
 
     if (selectedDistrict) {
         return <DistrictPage districtName={selectedDistrict.name} imageUrl={selectedDistrict.imageUrl} onBack={handleGoHome} />;
@@ -45,7 +85,9 @@ const App: React.FC = () => {
                 <Initiative />
                 <Divider />
                 <OurAims />
-                <Spotlight onSelectDistrict={handleSelectDistrict} />
+                <div id="spotlight">
+                    <Spotlight onSelectDistrict={handleSelectDistrict} />
+                </div>
                 <Posters />
                 <Objectives />
             </main>
