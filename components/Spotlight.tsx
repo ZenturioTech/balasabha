@@ -114,22 +114,165 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
         }
     };
 
+    const classifyLocation = (label: string): { baseName: string; kind: 'panchayath' | 'block' | 'municipality' | 'corporation' } => {
+        const v = label.trim();
+        if (v.includes('Municipal Corporation')) {
+            return { baseName: v.replace(' Municipal Corporation', ''), kind: 'corporation' };
+        }
+        if (v.includes('Municipality')) {
+            return { baseName: v.replace(' Municipality', ''), kind: 'municipality' };
+        }
+        if (v.includes(' Block Panchayat')) {
+            return { baseName: v.replace(' Block Panchayat', ''), kind: 'block' };
+        }
+        return { baseName: v, kind: 'panchayath' };
+    };
+
+    const ulbBaseSet = React.useMemo(() => {
+        const set = new Set<string>();
+        keralaLocations.forEach(l => {
+            if (l.includes('Municipal Corporation')) set.add(l.replace(' Municipal Corporation', '').toLowerCase());
+            else if (l.includes('Municipality')) set.add(l.replace(' Municipality', '').toLowerCase());
+        });
+        return set;
+    }, []);
+
+    const blockBaseSet = React.useMemo(() => {
+        const set = new Set<string>();
+        keralaLocations.forEach(l => {
+            if (l.includes(' Block Panchayat')) set.add(l.replace(' Block Panchayat', '').toLowerCase());
+        });
+        return set;
+    }, []);
+
+    const panchayathSet = React.useMemo(() => {
+        const set = new Set<string>();
+        keralaLocations.forEach(l => {
+            if (l.includes('Municipal Corporation')) return;
+            if (l.includes('Municipality')) return;
+            if (l.includes(' Block Panchayat')) return;
+            set.add(l.toLowerCase());
+        });
+        return set;
+    }, []);
+
+    const formatSuggestion = (raw: string): string => {
+        const c = classifyLocation(raw);
+        if (c.kind === 'corporation') return `${c.baseName} - Municipal Corporation`;
+        if (c.kind === 'municipality') return `${c.baseName} - Municipality`;
+        if (c.kind === 'block') return `${c.baseName} - Block`;
+        return `${c.baseName} - Panchayath`;
+    };
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value;
         setSearchQuery(query);
         if (query.length > 1) {
-            const filteredSuggestions = keralaLocations.filter(location =>
-                location.toLowerCase().includes(query.toLowerCase())
-            );
+            const filteredSuggestions = keralaLocations
+                .filter(location => location.toLowerCase().includes(query.toLowerCase()))
+                .map(formatSuggestion);
             setSuggestions(filteredSuggestions);
         } else {
             setSuggestions([]);
         }
     };
     
-    const handleSuggestionClick = (suggestion: string) => {
+    const handleSuggestionClick = async (suggestion: string) => {
         setSearchQuery(suggestion);
         setSuggestions([]);
+        const parsed = suggestion.split(' - ');
+        const name = parsed[0] || suggestion;
+        const typeLabel = (parsed[1] || '').toLowerCase();
+        let kind: 'panchayath' | 'block' | 'municipality' | 'corporation' = 'panchayath';
+        if (typeLabel.includes('corporation')) kind = 'corporation';
+        else if (typeLabel.includes('municipality')) kind = 'municipality';
+        else if (typeLabel.includes('block')) kind = 'block';
+        await performSearch(name, kind);
+    };
+
+    const inferKind = (name: string): 'panchayath' | 'block' | 'municipality' | 'corporation' => {
+        const lc = name.toLowerCase();
+        if (ulbBaseSet.has(lc)) {
+            // Could be municipality or corporation; default to municipality unless explicitly known
+            // We cannot easily distinguish, but both use name+ulb pattern
+            return 'municipality';
+        }
+        if (blockBaseSet.has(lc)) return 'block';
+        return 'panchayath';
+    };
+
+    const performSearch = async (name: string, kind?: 'panchayath' | 'block' | 'municipality' | 'corporation') => {
+        try {
+            setLoading(true);
+            setError(null);
+            const resolvedKind = kind ?? inferKind(name);
+            // eslint-disable-next-line no-console
+            console.log('[Spotlight] Search', { name, resolvedKind });
+            let query = supabase
+                .from('metadata')
+                .select('id, created_at, metadata, district, username, block_ulb, panchayath')
+                .order('created_at', { ascending: false })
+                .limit(100);
+
+            if (resolvedKind === 'panchayath') {
+                query = query.or(`metadata->>panchayath.ilike.%${name}%,panchayath.ilike.%${name}%`);
+            } else if (resolvedKind === 'block') {
+                query = query.or(`metadata->>block.ilike.%${name}%,block_ulb.ilike.%${name}%`);
+            } else {
+                // municipality or corporation: use name+ulb pattern
+                const pattern = `${name.toLowerCase()}ulb`;
+                query = query.ilike('block_ulb', `%${pattern}%`);
+            }
+
+            const { data, error: fetchError } = await query;
+            if (fetchError) throw fetchError;
+
+            const toTitleCase = (input: string): string => {
+                return input
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+                    .join(' ');
+            };
+
+            const mapped: SpotlightVideo[] = (data as any[])
+                .map((row) => {
+                    const m = row.metadata ?? {};
+                    const district = (m.district || row.district || '').toString();
+                    const basePanch = (m.panchayath || row.panchayath || '').toString();
+                    const blockUlbRaw = (row.block_ulb || m.block || '').toString();
+                    const blockUlbLc = blockUlbRaw.toLowerCase();
+                    const isUlb = !!blockUlbLc && blockUlbLc.endsWith('ulb');
+                    let panch = basePanch;
+                    if (isUlb) {
+                        const ulbBase = blockUlbLc.replace(/ulb$/i, '').trim();
+                        const ulbNameDisplay = toTitleCase(ulbBase);
+                        panch = ulbNameDisplay ? `${ulbNameDisplay} ULB` : 'Urban Local Body';
+                    }
+                    const wardRaw = m.ward ?? '';
+                    const wardLabel = wardRaw ? `Ward ${wardRaw}` : '';
+                    return {
+                        id: String(row.id),
+                        name: (m.name || row.username || 'Participant').toString(),
+                        district,
+                        panchayath: panch,
+                        wardLabel,
+                        thumbnailUrl: (m.thumbnailUrl || '/images/girlw.png').toString(),
+                        videoUrl: (m.videoUrl || '').toString(),
+                    };
+                })
+                .filter(v => v.videoUrl);
+
+            // For searches, show up to desired count but keep order by created_at
+            const isDesktop = typeof window !== 'undefined' ? window.innerWidth >= 1024 : true;
+            const count = isDesktop ? DESKTOP_TILE_COUNT : MOBILE_TILE_COUNT;
+                setAllVideos(uniqueById(mapped));
+            setDisplayVideos(mapped.slice(0, count));
+        } catch (e: any) {
+            setError(e?.message || 'Search failed');
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -220,7 +363,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                 // eslint-disable-next-line no-console
                 console.log('[Spotlight] Mapped videos count', mapped.length, mapped.slice(0, 3));
 
-                setAllVideos(mapped);
+                setAllVideos(uniqueById(mapped));
             } catch (e: any) {
                 setError(e?.message || 'Failed to load videos');
                 // Debug: error during fetch
@@ -233,15 +376,29 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
         fetchVideos();
     }, []);
 
+    const uniqueById = (items: SpotlightVideo[]): SpotlightVideo[] => {
+        const seen = new Set<string>();
+        const out: SpotlightVideo[] = [];
+        for (const it of items) {
+            if (!seen.has(it.id)) {
+                seen.add(it.id);
+                out.push(it);
+            }
+        }
+        return out;
+    };
+
     const buildRandomizedList = (source: SpotlightVideo[], desiredCount: number): SpotlightVideo[] => {
         if (source.length === 0) return [];
-        const shuffled = [...source].sort(() => Math.random() - 0.5);
+        // ensure we only duplicate if we have fewer than desiredCount in the source
+        const unique = uniqueById(source);
+        const shuffled = [...unique].sort(() => Math.random() - 0.5);
         if (shuffled.length >= desiredCount) {
             return shuffled.slice(0, desiredCount);
         }
-        const result: SpotlightVideo[] = [];
+        const result: SpotlightVideo[] = [...shuffled];
         let i = 0;
-        while (result.length < desiredCount) {
+        while (result.length < desiredCount && shuffled.length > 0) {
             result.push(shuffled[i % shuffled.length]);
             i += 1;
         }
@@ -255,25 +412,16 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
         }
         const isDesktop = typeof window !== 'undefined' ? window.innerWidth >= 1024 : true;
         const count = isDesktop ? DESKTOP_TILE_COUNT : MOBILE_TILE_COUNT;
-        // Debug: build list initial
         // eslint-disable-next-line no-console
-        console.log('[Spotlight] Building display list', { total: allVideos.length, isDesktop, count });
+        console.log('[Spotlight] Initial display list', { total: allVideos.length, isDesktop, count });
         setDisplayVideos(buildRandomizedList(allVideos, count));
-        // Rebuild when window resizes (simple listener)
-        const onResize = () => {
-            const nowDesktop = window.innerWidth >= 1024;
-            const nextCount = nowDesktop ? DESKTOP_TILE_COUNT : MOBILE_TILE_COUNT;
-            setDisplayVideos(buildRandomizedList(allVideos, nextCount));
-            // Debug: on resize
-            // eslint-disable-next-line no-console
-            console.log('[Spotlight] Resize rebuild', { nowDesktop, nextCount });
-        };
-        window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
+        // No interval/resize refresh; only set once per data load
     }, [allVideos]);
 
+    const RENDER_TILE_COUNT = 8;
+    const limitedVideos: SpotlightVideo[] = displayVideos.slice(0, RENDER_TILE_COUNT);
     const desktopCols: SpotlightVideo[][] = [[], [], [], []];
-    displayVideos.forEach((video, index) => {
+    limitedVideos.forEach((video, index) => {
         desktopCols[index % 4].push(video);
     });
     
@@ -321,7 +469,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                     )}
                     {/* Mobile & Tablet view - default grid */}
                     <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:hidden ">
-                        {displayVideos.map((video) => (
+                        {limitedVideos.map((video) => (
                             <div key={video.id} className="group relative" onClick={() => openModal(video)}>
                                 <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg">
                                     <img src={video.thumbnailUrl} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Spotlight video thumbnail" />
@@ -393,8 +541,32 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                             value={searchQuery}
                             onChange={handleInputChange}
                             onFocus={handleInputChange}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    const parsed = searchQuery.split(' - ');
+                                    const name = (parsed[0] || searchQuery).trim();
+                                    const typeLabel = (parsed[1] || '').toLowerCase();
+                                    let kind: 'panchayath' | 'block' | 'municipality' | 'corporation' | undefined;
+                                    if (typeLabel.includes('corporation')) kind = 'corporation';
+                                    else if (typeLabel.includes('municipality')) kind = 'municipality';
+                                    else if (typeLabel.includes('block')) kind = 'block';
+                                    performSearch(name, kind);
+                                }
+                            }}
                          />
-                        <button className="absolute right-2 bg-teal-500 text-white font-semibold text-sm sm:text-base py-2 px-4 sm:py-3 sm:px-8 rounded-full hover:bg-teal-600 transition-colors shadow-md">Search</button>
+                        <button 
+                            className="absolute right-2 bg-teal-500 text-white font-semibold text-sm sm:text-base py-2 px-4 sm:py-3 sm:px-8 rounded-full hover:bg-teal-600 transition-colors shadow-md"
+                            onClick={() => {
+                                const parsed = searchQuery.split(' - ');
+                                const name = (parsed[0] || searchQuery).trim();
+                                const typeLabel = (parsed[1] || '').toLowerCase();
+                                let kind: 'panchayath' | 'block' | 'municipality' | 'corporation' | undefined;
+                                if (typeLabel.includes('corporation')) kind = 'corporation';
+                                else if (typeLabel.includes('municipality')) kind = 'municipality';
+                                else if (typeLabel.includes('block')) kind = 'block';
+                                performSearch(name, kind);
+                            }}
+                        >Search</button>
                     </div>
                     {suggestions.length > 0 && (
                         <div className="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
