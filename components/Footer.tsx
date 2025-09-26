@@ -24,7 +24,7 @@ const Footer: React.FC = () => {
                     <p className="pt-2 text-gray-900">© Copyright 2025 Kudumbashree I All Rights Reserved</p>
                     <div className="flex justify-center gap-6 pt-1">
                         <a href="#" className="text-teal-600 hover:underline">Privacy Policy</a>
-                        <a href="#" className="text-teal-600 hover:underline">Terms&condition</a>
+                        <a href="#" className="text-teal-600 hover:underline">Terms & Condition</a>
                     </div>
                 </div>
 
