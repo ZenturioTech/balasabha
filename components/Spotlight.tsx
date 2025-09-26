@@ -101,6 +101,9 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
 
     const [allVideos, setAllVideos] = useState<SpotlightVideo[]>([]);
     const [displayVideos, setDisplayVideos] = useState<SpotlightVideo[]>([]);
+    const [searchResults, setSearchResults] = useState<SpotlightVideo[]>([]);
+    const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
+    const [isSearching, setIsSearching] = useState<boolean>(false);
     const [selectedVideo, setSelectedVideo] = useState<SpotlightVideo | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isModalClosing, setIsModalClosing] = useState<boolean>(false);
@@ -203,6 +206,8 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
 
     const performSearch = async (name: string, kind?: 'panchayath' | 'block' | 'municipality' | 'corporation') => {
         try {
+            setIsSearching(true);
+            setShowSearchResults(false);
             setLoading(true);
             setError(null);
             const resolvedKind = kind ?? inferKind(name);
@@ -263,15 +268,17 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                 })
                 .filter(v => v.videoUrl);
 
-            // For searches, show up to desired count but keep order by created_at
-            const isDesktop = typeof window !== 'undefined' ? window.innerWidth >= 1024 : true;
-            const count = isDesktop ? DESKTOP_TILE_COUNT : MOBILE_TILE_COUNT;
-                setAllVideos(uniqueById(mapped));
-            setDisplayVideos(mapped.slice(0, count));
+            // Store full results and display results page
+            setSearchResults(uniqueById(mapped));
+            setShowSearchResults(true);
+            if (interactiveSectionRef.current) {
+                interactiveSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+            }
         } catch (e: any) {
             setError(e?.message || 'Search failed');
         } finally {
             setLoading(false);
+            setIsSearching(false);
         }
     };
 
@@ -454,7 +461,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
     return (
         <section id="interactive-section" ref={interactiveSectionRef} className="pt-8 md:pt-16 pb-8 px-6 text-center">
             {/* Spotlight View */}
-            <div id="spotlight-container" className={showDistricts ? 'hidden' : ''}>
+            <div id="spotlight-container" className={showDistricts || showSearchResults ? 'hidden' : ''}>
                 <h2 className="text-3xl md:text-6xl font-bold text-teal-600  mb-12 font-serif">Dream Vibes Spotlight</h2>
                 
                 <div className="max-w-6xl mx-auto">
@@ -531,7 +538,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
             </div>
 
             {/* District Search View */}
-            <div id="district-search-container" className={!showDistricts ? 'hidden' : ''}>
+            <div id="district-search-container" className={!showDistricts || showSearchResults ? 'hidden' : ''}>
                 <div className="relative max-w-xl mx-auto mb-12" ref={searchContainerRef}>
                      <div className="relative flex items-center w-full">
                         <input 
@@ -602,6 +609,52 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                 </div>
                 <button id="back-to-spotlight-btn" onClick={toggleViews} className="mt-12 text-teal-600 font-bold hover:text-teal-800 transition-colors">{'<< Back to Spotlight'}</button>
             </div>
+
+            {/* Search Results View */}
+            {showSearchResults && (
+                <div id="search-results" className="bg-white py-8">
+                    <div className="max-w-6xl mx-auto px-2 sm:px-4">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-2xl sm:text-3xl font-semibold text-teal-700">Search Results</h3>
+                            <button
+                                className="text-teal-600 hover:text-teal-800 font-semibold"
+                                onClick={() => { setShowSearchResults(false); setSearchResults([]); }}
+                            >Close</button>
+                        </div>
+                        {isSearching && (
+                            <div className="text-gray-600 mb-6">Searching...</div>
+                        )}
+                        {!isSearching && searchResults.length === 0 && (
+                            <div className="text-gray-600 mb-6">No matching videos found.</div>
+                        )}
+                        {!isSearching && searchResults.length > 0 && (
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                {searchResults.map(video => (
+                                    <div key={video.id} className="group relative" onClick={() => openModal(video)}>
+                                        <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg">
+                                            <img src={video.thumbnailUrl} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Video thumbnail" />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-teal-800/80 via-transparent to-black/20"></div>
+                                            <div className="absolute top-3 left-3 flex items-center gap-1 text-white text-xs bg-black/30 px-2 py-1 rounded-full">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
+                                                <span>{video.district}</span>
+                                            </div>
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <div className="w-14 h-14 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-white/50 group-hover:scale-110">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
+                                                </div>
+                                            </div>
+                                            <div className="absolute bottom-0 left-0 p-4 text-white">
+                                                <h3 className="font-bold">{video.name}</h3>
+                                                <p className="text-xs">{video.wardLabel}{video.wardLabel ? ', ' : ''}{video.panchayath}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Video Modal */}
             {isModalOpen && selectedVideo && (
