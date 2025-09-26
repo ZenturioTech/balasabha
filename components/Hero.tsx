@@ -14,7 +14,7 @@ const Hero: React.FC = () => {
                 <div className="bg-white rounded-full shadow-lg px-4 sm:px-6 py-2 flex items-center justify-between">
                     <img src="/images/kerala final emblem_0.jpg" alt="Kerala Government Emblem" className="h-8 sm:h-10" />
                     <img src="/images/Layer 2 copy (1).png" alt="Dream Vibes Logo" className="h-10 sm:h-12" />
-                    <img src="/images/Kudumbasree-Logo-Vector.svg-.png" alt="Balasabha Logo" className="h-8 sm:h-10" />
+                    <img src="/images/kudumbasree.png" alt="Balasabha Logo" className="h-8 sm:h-10" />
                 </div>
             </header>
 

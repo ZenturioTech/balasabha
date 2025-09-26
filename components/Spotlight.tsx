@@ -177,6 +177,14 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                     data = fallbackData ?? [];
                 }
 
+                const toTitleCase = (input: string): string => {
+                    return input
+                        .split(/\s+/)
+                        .filter(Boolean)
+                        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+                        .join(' ');
+                };
+
                 const mapped: SpotlightVideo[] = (data as MetadataRow[])
                     .filter((row) => {
                         const mt = (row.metadata as any)?.mediaType;
@@ -185,7 +193,16 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
                     .map((row) => {
                     const m = row.metadata ?? {};
                     const district = (m.district || row.district || '').toString();
-                    const panch = (m.panchayath || row.panchayath || '').toString();
+                    const basePanch = (m.panchayath || row.panchayath || '').toString();
+                    const blockUlbRaw = ((row as any).block_ulb || (m as any).block || '').toString();
+                    const blockUlbLc = blockUlbRaw.toLowerCase();
+                    const isUlb = !!blockUlbLc && blockUlbLc.endsWith('ulb');
+                    let panch = basePanch;
+                    if (isUlb) {
+                        const ulbBase = blockUlbLc.replace(/ulb$/i, '').trim();
+                        const ulbNameDisplay = toTitleCase(ulbBase);
+                        panch = ulbNameDisplay ? `${ulbNameDisplay} ULB` : 'Urban Local Body';
+                    }
                     const wardRaw = m.ward ?? '';
                     const wardLabel = wardRaw ? `Ward ${wardRaw}` : '';
                     return {

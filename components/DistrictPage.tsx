@@ -29,11 +29,11 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
                     aria-label="Go back to homepage"
                     role="button"
                 >
-                    <img 
+                    {/* <img 
                         src="https://i.ibb.co/TMnhybB2/Layer-2-copy-1.png" 
                         alt="Dream Vibes Logo" 
                         className="h-8 sm:h-12" 
-                    />
+                    /> */}
                 </div>
 
                 <div className="relative z-10 flex flex-col items-center gap-8 w-full max-w-3xl">

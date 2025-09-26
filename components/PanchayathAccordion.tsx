@@ -30,38 +30,67 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
             try {
                 setLoading(true);
                 setError(null);
-                const res = await fetch('/panchayath.csv', { cache: 'force-cache' });
-                if (!res.ok) throw new Error('Failed to load panchayath.csv');
-                const text = await res.text();
-                const lines = text.split(/\r?\n/).filter(Boolean);
-                // Expect header: no,Panchayaths,Block,District
-                const header = lines.shift() || '';
-                const cols = header.split(',');
-                const districtIdx = cols.findIndex(c => c.trim().toLowerCase() === 'district');
-                const blockIdx = cols.findIndex(c => c.trim().toLowerCase() === 'block');
-                if (districtIdx === -1 || blockIdx === -1) throw new Error('Invalid CSV format');
-                const normalize = (d: string) => {
-                    const v = d.trim().toLowerCase();
-                    if (v === 'trivandrum') return 'thiruvananthapuram';
-                    return v;
-                };
-                const target = normalize(districtName);
-                const blockSet = new Set<string>();
-                for (const line of lines) {
-                    const parts = line.split(',');
-                    if (parts.length <= Math.max(districtIdx, blockIdx)) continue;
-                    const district = (parts[districtIdx] || '').trim();
-                    const block = (parts[blockIdx] || '').trim();
-                    if (!district || !block) continue;
-                    if (normalize(district) === target) {
-                        blockSet.add(block);
+                
+                // Check if this is Urban Localbodies
+                if (districtName === 'Urban Localbodies') {
+                    const res = await fetch('/ulb.csv', { cache: 'force-cache' });
+                    if (!res.ok) throw new Error('Failed to load ulb.csv');
+                    const text = await res.text();
+                    const lines = text.split(/\r?\n/).filter(Boolean);
+                    // Expect header: SlNo,ULB,ULB Type,District
+                    const header = lines.shift() || '';
+                    const cols = header.split(',');
+                    const ulbIdx = cols.findIndex(c => c.trim().toLowerCase() === 'ulb');
+                    const typeIdx = cols.findIndex(c => c.trim().toLowerCase() === 'ulb type');
+                    if (ulbIdx === -1 || typeIdx === -1) throw new Error('Invalid ULB CSV format');
+                    
+                    const ulbSet = new Set<string>();
+                    for (const line of lines) {
+                        const parts = line.split(',');
+                        if (parts.length <= Math.max(ulbIdx, typeIdx)) continue;
+                        const ulb = (parts[ulbIdx] || '').trim();
+                        const type = (parts[typeIdx] || '').trim();
+                        if (!ulb || !type) continue;
+                        ulbSet.add(`${ulb} ${type}`);
+                    }
+                    if (!cancelled) {
+                        setBlocks(Array.from(ulbSet).sort());
+                    }
+                } else {
+                    // Regular district - load panchayath.csv
+                    const res = await fetch('/panchayath.csv', { cache: 'force-cache' });
+                    if (!res.ok) throw new Error('Failed to load panchayath.csv');
+                    const text = await res.text();
+                    const lines = text.split(/\r?\n/).filter(Boolean);
+                    // Expect header: no,Panchayaths,Block,District
+                    const header = lines.shift() || '';
+                    const cols = header.split(',');
+                    const districtIdx = cols.findIndex(c => c.trim().toLowerCase() === 'district');
+                    const blockIdx = cols.findIndex(c => c.trim().toLowerCase() === 'block');
+                    if (districtIdx === -1 || blockIdx === -1) throw new Error('Invalid CSV format');
+                    const normalize = (d: string) => {
+                        const v = d.trim().toLowerCase();
+                        if (v === 'trivandrum') return 'thiruvananthapuram';
+                        return v;
+                    };
+                    const target = normalize(districtName);
+                    const blockSet = new Set<string>();
+                    for (const line of lines) {
+                        const parts = line.split(',');
+                        if (parts.length <= Math.max(districtIdx, blockIdx)) continue;
+                        const district = (parts[districtIdx] || '').trim();
+                        const block = (parts[blockIdx] || '').trim();
+                        if (!district || !block) continue;
+                        if (normalize(district) === target) {
+                            blockSet.add(block);
+                        }
+                    }
+                    if (!cancelled) {
+                        setBlocks(Array.from(blockSet).sort());
                     }
                 }
-                if (!cancelled) {
-                    setBlocks(Array.from(blockSet).sort());
-                }
             } catch (e: any) {
-                if (!cancelled) setError(e?.message || 'Failed to load blocks');
+                if (!cancelled) setError(e?.message || 'Failed to load data');
             } finally {
                 if (!cancelled) setLoading(false);
             }
@@ -74,13 +103,13 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
 
     useEffect(() => {
         setItems(blocks.map(b => ({ 
-            name: `${b} Block Panchayath`, 
+            name: districtName === 'Urban Localbodies' ? b : `${b} Block Panchayath`, 
             blockName: b,
             videos: [], 
             loading: false, 
             error: null 
         })));
-    }, [blocks]);
+    }, [blocks, districtName]);
 
     const fetchBlockVideos = async (blockName: string, index: number) => {
         if (items[index]?.videos.length > 0) return; // Already loaded
@@ -91,14 +120,50 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
         ));
         
         try {
-            const { data, error: fetchError } = await supabase
-                .from('metadata')
-                .select('id, created_at, metadata, district, username, block_ulb, panchayath')
-                .or(`metadata->>block.ilike.%${blockName}%,block_ulb.ilike.%${blockName}%`)
-                .order('created_at', { ascending: false })
-                .limit(100);
+            let query;
+            if (districtName === 'Urban Localbodies') {
+                // For ULB entities, filter by municipality name + "ulb" pattern
+                let ulbName;
+                if (blockName.includes('Municipal Corporation')) {
+                    // Remove "Municipal Corporation" (2 words)
+                    ulbName = blockName.replace(' Municipal Corporation', '');
+                } else if (blockName.includes('Municipality')) {
+                    // Remove "Municipality" (1 word)
+                    ulbName = blockName.replace(' Municipality', '');
+                } else {
+                    // Fallback: remove last word
+                    ulbName = blockName.split(' ').slice(0, -1).join(' ');
+                }
+                // Create the ULB pattern: municipality name + "ulb" (e.g., "aluvaulb")
+                const ulbPattern = `${ulbName.toLowerCase()}ulb`;
+                console.log('[PanchayathAccordion] ULB filtering:', { blockName, ulbName, ulbPattern });
+                query = supabase
+                    .from('metadata')
+                    .select('id, created_at, metadata, district, username, block_ulb, panchayath')
+                    .ilike('block_ulb', `%${ulbPattern}%`)
+                    .order('created_at', { ascending: false })
+                    .limit(100);
+            } else {
+                // For regular districts, search by block name
+                console.log('[PanchayathAccordion] Block filtering:', { blockName });
+                query = supabase
+                    .from('metadata')
+                    .select('id, created_at, metadata, district, username, block_ulb, panchayath')
+                    .or(`metadata->>block.ilike.%${blockName}%,block_ulb.ilike.%${blockName}%`)
+                    .order('created_at', { ascending: false })
+                    .limit(100);
+            }
+
+            const { data, error: fetchError } = await query;
 
             if (fetchError) throw fetchError;
+
+            console.log('[PanchayathAccordion] Query result:', { 
+                districtName, 
+                blockName, 
+                resultCount: data?.length,
+                sampleData: data?.[0] 
+            });
 
             const mapped = (data as any[]).map((row) => {
                 const m = row.metadata ?? {};
@@ -114,8 +179,38 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
                     wardLabel,
                     thumbnailUrl: (m.thumbnailUrl || '/images/girlw.png').toString(),
                     videoUrl: (m.videoUrl || '').toString(),
+                    block_ulb: row.block_ulb || '',
                 };
-            }).filter(v => v.videoUrl);
+            }).filter(v => {
+                // Filter out videos without videoUrl
+                if (!v.videoUrl) return false;
+                
+                // For Urban Localbodies, ensure the video actually belongs to the selected ULB
+                if (districtName === 'Urban Localbodies') {
+                    let ulbName;
+                    if (blockName.includes('Municipal Corporation')) {
+                        ulbName = blockName.replace(' Municipal Corporation', '');
+                    } else if (blockName.includes('Municipality')) {
+                        ulbName = blockName.replace(' Municipality', '');
+                    } else {
+                        ulbName = blockName.split(' ').slice(0, -1).join(' ');
+                    }
+                    // Create the ULB pattern: municipality name + "ulb" (e.g., "aluvaulb")
+                    const ulbPattern = `${ulbName.toLowerCase()}ulb`;
+                    const blockUlb = v.block_ulb?.toLowerCase() || '';
+                    const matchesUlb = blockUlb.includes(ulbPattern);
+                    console.log('[PanchayathAccordion] ULB match check:', { 
+                        ulbName, 
+                        ulbPattern,
+                        blockUlb, 
+                        matchesUlb,
+                        videoName: v.name 
+                    });
+                    return matchesUlb;
+                }
+                
+                return true;
+            });
 
             // Update the specific item with videos
             setItems(prev => prev.map((item, i) => 
@@ -173,13 +268,17 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
     return (
         <div className="space-y-2">
             {loading && (
-                <div className="text-gray-600 text-center py-6">Loading blocks...</div>
+                <div className="text-gray-600 text-center py-6">
+                    {districtName === 'Urban Localbodies' ? 'Loading Urban Local Bodies...' : 'Loading blocks...'}
+                </div>
             )}
             {error && (
                 <div className="text-red-600 text-center py-6">{error}</div>
             )}
             {!loading && !error && items.length === 0 && (
-                <div className="text-gray-500 text-center py-6">No blocks found for this district.</div>
+                <div className="text-gray-500 text-center py-6">
+                    {districtName === 'Urban Localbodies' ? 'No Urban Local Bodies found.' : 'No blocks found for this district.'}
+                </div>
             )}
             {!loading && !error && items.map((item, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg shadow-sm overflow-hidden bg-white">
@@ -239,7 +338,9 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
                                 </div>
                             )}
                             {!item.loading && !item.error && item.videos.length === 0 && (
-                                <p className="text-gray-500 text-center py-4">No videos available for this block.</p>
+                                <p className="text-gray-500 text-center py-4">
+                                    {districtName === 'Urban Localbodies' ? 'No videos available for this Urban Local Body.' : 'No videos available for this block.'}
+                                </p>
                             )}
                         </div>
                     </div>
