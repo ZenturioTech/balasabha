@@ -37,6 +37,7 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
     const classify = (label: string): { base: string; kind: 'panchayath' | 'block' | 'municipality' | 'corporation' } => {
         const v = label.trim();
         if (v.includes('Municipal Corporation')) return { base: v.replace(' Municipal Corporation', ''), kind: 'corporation' };
+        if (v.includes(' Corporation')) return { base: v.replace(' Corporation', ''), kind: 'corporation' };
         if (v.includes('Municipality')) return { base: v.replace(' Municipality', ''), kind: 'municipality' };
         if (v.includes(' Block Panchayat')) return { base: v.replace(' Block Panchayat', ''), kind: 'block' };
         return { base: v, kind: 'panchayath' };

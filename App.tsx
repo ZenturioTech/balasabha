@@ -22,6 +22,7 @@ interface SelectedDistrict {
 
 const App: React.FC = () => {
     const [selectedDistrict, setSelectedDistrict] = useState<SelectedDistrict | null>(null);
+    const [showDistrictsOnHome, setShowDistrictsOnHome] = useState<boolean>(false);
 
     const handleSelectDistrict = (districtName: string, imageUrl: string) => {
         setSelectedDistrict({ name: districtName, imageUrl });
@@ -38,10 +39,11 @@ const App: React.FC = () => {
 
     const handleGoHome = () => {
         setSelectedDistrict(null);
+        setShowDistrictsOnHome(true);
         try {
             const url = new URL(window.location.href);
-            url.hash = '#spotlight=districts';
-            window.history.pushState({}, '', url.toString());
+            url.hash = '';
+            window.history.pushState({ showDistricts: true }, '', url.toString());
         } catch (_) {
             // no-op
         }
@@ -86,7 +88,7 @@ const App: React.FC = () => {
                 <Divider />
                 <OurAims />
                 <div id="spotlight">
-                    <Spotlight onSelectDistrict={handleSelectDistrict} />
+                    <Spotlight onSelectDistrict={handleSelectDistrict} startInDistricts={showDistrictsOnHome} />
                 </div>
                 <Posters />
                 <Objectives />
