@@ -292,6 +292,21 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict }) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // When landing via hash #spotlight=districts, show the districts grid by default
+    useEffect(() => {
+        try {
+            const hash = window.location.hash || '';
+            if (hash.toLowerCase().includes('#spotlight=districts')) {
+                setShowDistricts(true);
+                if (interactiveSectionRef.current) {
+                    interactiveSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        } catch (_) {
+            // no-op
+        }
+    }, []);
+
     useEffect(() => {
         const fetchVideos = async () => {
             try {
