@@ -5,7 +5,7 @@ const Hero: React.FC = () => {
         <section className="relative h-[70vh] sm:h-[85vh] w-full text-white overflow-hidden shadow-lg">
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
-                <img src="/images/hawaii-beach-landscape-with-nature-coastline.jpg" alt="Coastal landscape at sunset" className="w-full h-full object-cover" />
+                <img src="/images/hawaii-beach.webp" alt="Coastal landscape at sunset" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/30"></div>
             </div>
 
