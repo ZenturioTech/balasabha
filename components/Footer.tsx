@@ -14,13 +14,13 @@ const Footer: React.FC = () => {
                     {/* Logo */}
                     <div className="flex-shrink-0">
                         {/* The logo in the user's image has a white background box */}
-                        <div className="bg-white p-2">
+                        
                             <img 
                                 src="/images/kudumbasree.png" 
                                 alt="Kudumbashree Logo" 
                                 className="h-20"
                             />
-                        </div>
+                       
                     </div>
 
                     {/* Main Content: Centered */}
