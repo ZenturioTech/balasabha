@@ -1736,7 +1736,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                         <div className="text-gray-600 mb-6">Loading videos...</div>
                     )}
                     {!loading && !error && displayVideos.length === 0 && (
-                        <div className="text-gray-600 mb-6">No videos available. Check console for details.</div>
+                        <div className="text-gray-600 mb-6">No content available.</div>
                     )}
                     {/* Mobile & Tablet view - default grid */}
                     <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:hidden ">
