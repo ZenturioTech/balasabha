@@ -592,7 +592,7 @@ export default function CMS() {
                   required
                   value={form.ulb}
                   onChange={(e) => setForm({ ...form, ulb: e.target.value })}
-                  disabled={!userMeta?.district}
+                  disabled={!userMeta?.district || (!!userMeta && !userMeta.blockName)}
                 >
                   <option value="" disabled>{userMeta?.district ? 'Select ULB' : 'District not set'}</option>
                   {ulbOptions.map((u) => (
