@@ -100,7 +100,6 @@ const keralaLocations = [
     'Chengannur Municipality',
     'Kottayam Municipality',
     'Changanassery Municipality',
-    'Pala Municipality',
     'Vaikom Municipality',
     'Thodupuzha Municipality',
     'Kattappana Municipality',
@@ -116,13 +115,13 @@ const keralaLocations = [
     'Thrikkakara Municipality',
     'Thrippunithura Municipality',
     'Chalakudy Municipality',
-    'Guruvayur Municipality',
+    'Guruvayoor Municipality',
     'Irinjalakuda Municipality',
     'Kodungallur Municipality',
     'Chittur-Thathamangalam Municipality',
     'Ottappalam Municipality',
     'Palakkad Municipality',
-    'Shornur Municipality',
+    'Shoranur Municipality',
     'Kondotty Municipality',
     'Kottakkal Municipality',
     'Malappuram Municipality',
@@ -137,7 +136,7 @@ const keralaLocations = [
     'Payyannur Municipality',
     'Taliparamba Municipality',
     'Iritty Municipality',
-    'Mattanur Municipality',
+    'Mattannur Municipality',
     'Anthoor Municipality',
     'Panoor Municipality',
     'Sreekandapuram Municipality',
@@ -147,161 +146,170 @@ const keralaLocations = [
     'Sulthan Bathery Municipality',
     'Kanhangad Municipality',
     'Kasaragod Municipality',
-    'Nileshwaram Municipality',
-    // Block Panchayats
-    'Adimaly Block Panchayat',
-    'Alangad Block Panchayat',
-    'Alathur Block Panchayat',
-    'Ambalappuzha Block Panchayat',
-    'Anchal Block Panchayat',
-    'Angamaly Block Panchayat',
-    'Anthikad Block Panchayat',
-    'Areacode Block Panchayat',
-    'Aryad Block Panchayat',
-    'Athiyannoor Block Panchayat',
-    'Attappady Block Panchayat',
-    'Azhutha Block Panchayat',
-    'Balussery Block Panchayat',
-    'Bharanickavu Block Panchayat',
-    'Block Name Block Panchayat',
-    'Chadayamangalam Block Panchayat',
-    'Chalakudy Block Panchayat',
-    'Champakulam Block Panchayat',
-    'Chavakkad Block Panchayat',
-    'Chavara Block Panchayat',
-    'Chelannur Block Panchayat',
-    'Chengannur Block Panchayat',
-    'Cherpu Block Panchayat',
+        'Nileshwar Municipality',
+        'Koothattukulam Municipality',
+        'Piravom Municipality',
+        'Feroke Municipality',
+        'Mukkam Municipality',
+        'Payyoli Municipality',
+        'Ramanattukara Municipality',
+        'Parappanangadi Municipality',
+        'Cherpulassery Municipality',
+        'Shoranur Municipality',
+        'Kunnamkulam Municipality',
+    // Block Panchayats (exact names from block-username.csv)
+    'Varkala Block Panchayat',
+    'Kilimanoor Block Panchayat',
     'Chirayinkeezhu Block Panchayat',
+    'Vamanapuram Block Panchayat',
+    'Vellanad Block Panchayat',
+    'Nedumangad Block Panchayat',
+    'Pothencode Block Panchayat',
+    'Nemom Block Panchayat',
+    'Perumkadavila Block Panchayat',
+    'Athiyannoor Block Panchayat',
+    'Parassala Block Panchayat',
+    'Oachira Block Panchayat',
+    'Sasthamcotta Block Panchayat',
+    'Vettikavala Block Panchayat',
+    'Pathanapuram Block Panchayat',
+    'Anchal Block Panchayat',
+    'Kottarakara Block Panchayat',
     'Chittumala Block Panchayat',
-    'Chittur Block Panchayat',
-    'Chowannur Block Panchayat',
-    'Devikulam Block Panchayat',
-    'Edakkad Block Panchayat',
-    'Edappally Block Panchayat',
-    'Elanthoor Block Panchayat',
-    'Elemdesam Block Panchayat',
-    'Erattupetta Block Panchayat',
-    'Ettumanoor Block Panchayat',
-    'Haripad Block Panchayat',
-    'Idukki Block Panchayat',
-    'Irikkur Block Panchayat',
-    'Irinjalakuda Block Panchayat',
-    'Iritty Block Panchayat',
+    'Chavara Block Panchayat',
+    'Mukhathala Block Panchayat',
     'Ithikkara Block Panchayat',
-    'Kaduthuruthy Block Panchayat',
-    'Kalikavu Block Panchayat',
-    'Kalliasseri Block Panchayat',
-    'Kalpetta Block Panchayat',
-    'Kanhangad Block Panchayat',
+    'Chadayamangalam Block Panchayat',
+    'Mallappally Block Panchayat',
+    'Pulikeezhu Block Panchayat',
+    'Koipuram Block Panchayat',
+    'Elanthoor Block Panchayat',
+    'Ranni Block Panchayat',
+    'Konni Block Panchayat',
+    'Pandalam Block Panchayat',
+    'Parakkode Block Panchayat',
+    'Thycattussery Block Panchayat',
+    'Pattanakkad Block Panchayat',
     'Kanjikuzhy Block Panchayat',
+    'Aryad Block Panchayat',
+    'Ambalappuzha Block Panchayat',
+    'Champakulam Block Panchayat',
+    'Veliyanad Block Panchayat',
+    'Chengannur Block Panchayat',
+    'Haripad Block Panchayat',
+    'Mavelikara Block Panchayat',
+    'Bharanickavu Block Panchayat',
+    'Muthukulam Block Panchayat',
+    'Vaikom Block Panchayat',
+    'Kaduthuruthy Block Panchayat',
+    'Ettumanoor Block Panchayat',
+    'Uzhavoor Block Panchayat',
+    'Lalam Block Panchayat',
+    'Erattupetta Block Panchayat',
+    'Pampady Block Panchayat',
+    'Pallom Block Panchayat',
+    'Madappally Block Panchayat',
+    'Vazhoor Block Panchayat',
     'Kanjirappally Block Panchayat',
+    'Adimaly Block Panchayat',
+    'Devikulam Block Panchayat',
+    'Nedumkandam Block Panchayat',
+    'Elemdesam Block Panchayat',
+    'Idukki Block Panchayat',
+    'Kattappana Block Panchayat',
+    'Thodupuzha Block Panchayat',
+    'Azhutha Block Panchayat',
+    'Paravur Block Panchayat',
+    'Alangad Block Panchayat',
+    'Angamaly Block Panchayat',
+    'Koovappady Block Panchayat',
+    'Vazhakulam Block Panchayat',
+    'Edappally Block Panchayat',
+    'Vypin Block Panchayat',
+    'Palluruthy Block Panchayat',
+    'Mulanthuruthy Block Panchayat',
+    'Vadavucode Block Panchayat',
+    'Kothamangalam Block Panchayat',
+    'Pampakuda Block Panchayat',
+    'Parakkadavu Block Panchayat',
+    'Muvattupuzha Block Panchayat',
+    'Chavakkad Block Panchayat',
+    'Chowannur Block Panchayat',
+    'Wadakanchery Block Panchayat',
+    'Pazhayannur Block Panchayat',
+    'Ollukkara Block Panchayat',
+    'Puzhakkal Block Panchayat',
+    'Mullassery Block Panchayat',
+    'Thalikulam Block Panchayat',
+    'Anthikad Block Panchayat',
+    'Cherpu Block Panchayat',
+    'Kodakara Block Panchayat',
+    'Irinjalakuda Block Panchayat',
+    'Vellangallur Block Panchayat',
+    'Mathilakam Block Panchayat',
+    'Mala Block Panchayat',
+    'Chalakudy Block Panchayat',
+    'Trithala Block Panchayat',
+    'Pattambi Block Panchayat',
+    'Ottapalam Block Panchayat',
+    'Sreekrishnapuram Block Panchayat',
+    'Mannarkad Block Panchayat',
+    'Attappady Block Panchayat',
+    'Palakkad Block Panchayat',
+    'Kuzhalmannam Block Panchayat',
+    'Chittur Block Panchayat',
+    'Kollengode Block Panchayat',
+    'Nemmara Block Panchayat',
+    'Alathur Block Panchayat',
+    'Malampuzha Block Panchayat',
+    'Nilambur Block Panchayat',
+    'Kalikavu Block Panchayat',
+    'Wandoor Block Panchayat',
+    'Kondotty Block Panchayat',
+    'Areacode Block Panchayat',
+    'Malappuram Block Panchayat',
+    'Perinthalmanna Block Panchayat',
+    'Mankada Block Panchayat',
+    'Kuttippuram Block Panchayat',
+    'Vengara Block Panchayat',
+    'Tirurangadi Block Panchayat',
+    'Tanur Block Panchayat',
+    'Tirur Block Panchayat',
+    'Ponnani Block Panchayat',
+    'Perumpadappa Block Panchayat',
+    'Vatakara Block Panchayat',
+    'Tuneri Block Panchayat',
+    'Kunnummal Block Panchayat',
+    'Thodannur Block Panchayat',
+    'Melady Block Panchayat',
+    'Perambra Block Panchayat',
+    'Balussery Block Panchayat',
+    'Panthalayani Block Panchayat',
+    'Chelannur Block Panchayat',
+    'Koduvally Block Panchayat',
+    'Kunnamangalam Block Panchayat',
+    'Kozhikkode Block Panchayat',
+    'Mananthavady Block Panchayat',
+    'Panamaram Block Panchayat',
+    'Sulthan Bathery Block Panchayat',
+    'Kalpetta Block Panchayat',
+    'Payyannur Block Panchayat',
+    'Kalliasseri Block Panchayat',
+    'Thalipparamba Block Panchayat',
+    'Irikkur Block Panchayat',
     'Kannur Block Panchayat',
+    'Edakkad Block Panchayat',
+    'Thalassery Block Panchayat',
+    'Panoor Block Panchayat',
+    'Kuthuparamba Block Panchayat',
+    'Iritty Block Panchayat',
+    'Peravoor Block Panchayat',
+    'Manjesaram Block Panchayat',
     'Karadka Block Panchayat',
     'Kasaragod Block Panchayat',
-    'Kattappana Block Panchayat',
-    'Kilimanoor Block Panchayat',
-    'Kodakara Block Panchayat',
-    'Koduvally Block Panchayat',
-    'Koipuram Block Panchayat',
-    'Kollengode Block Panchayat',
-    'Kondotty Block Panchayat',
-    'Konni Block Panchayat',
-    'Koovappady Block Panchayat',
-    'Kothamangalam Block Panchayat',
-    'Kottarakara Block Panchayat',
-    'Kozhikkode Block Panchayat',
-    'Kunnamangalam Block Panchayat',
-    'Kunnummal Block Panchayat',
-    'Kuthuparamba Block Panchayat',
-    'Kuttippuram Block Panchayat',
-    'Kuzhalmannam Block Panchayat',
-    'Lalam Block Panchayat',
-    'Madappally Block Panchayat',
-    'Mala Block Panchayat',
-    'Malampuzha Block Panchayat',
-    'Malappuram Block Panchayat',
-    'Mallappally Block Panchayat',
-    'Mananthavady Block Panchayat',
-    'Manjesaram Block Panchayat',
-    'Mankada Block Panchayat',
-    'Mannarkad Block Panchayat',
-    'Mathilakam Block Panchayat',
-    'Mavelikara Block Panchayat',
-    'Melady Block Panchayat',
-    'Mukhathala Block Panchayat',
-    'Mulanthuruthy Block Panchayat',
-    'Mullassery Block Panchayat',
-    'Muthukulam Block Panchayat',
-    'Muvattupuzha Block Panchayat',
-    'Nedumangad Block Panchayat',
-    'Nedumkandam Block Panchayat',
-    'Nemmara Block Panchayat',
-    'Nemom Block Panchayat',
-    'Nilambur Block Panchayat',
-    'Nileswaram Block Panchayat',
-    'Oachira Block Panchayat',
-    'Ollukkara Block Panchayat',
-    'Ottapalam Block Panchayat',
-    'Palakkad Block Panchayat',
-    'Pallom Block Panchayat',
-    'Palluruthy Block Panchayat',
-    'Pampady Block Panchayat',
-    'Pampakuda Block Panchayat',
-    'Panamaram Block Panchayat',
-    'Pandalam Block Panchayat',
-    'Panoor Block Panchayat',
-    'Panthalayani Block Panchayat',
-    'Parakkadavu Block Panchayat',
-    'Parakkode Block Panchayat',
+    'Kanhangad Block Panchayat',
     'Parappa Block Panchayat',
-    'Parassala Block Panchayat',
-    'Paravur Block Panchayat',
-    'Pathanapuram Block Panchayat',
-    'Pattambi Block Panchayat',
-    'Pattanakkad Block Panchayat',
-    'Payyannur Block Panchayat',
-    'Pazhayannur Block Panchayat',
-    'Perambra Block Panchayat',
-    'Peravoor Block Panchayat',
-    'Perinthalmanna Block Panchayat',
-    'Perumkadavila Block Panchayat',
-    'Perumpadappa Block Panchayat',
-    'Ponnani Block Panchayat',
-    'Pothencode Block Panchayat',
-    'Pulikeezhu Block Panchayat',
-    'Puzhakkal Block Panchayat',
-    'Ranni Block Panchayat',
-    'Sasthamcotta Block Panchayat',
-    'Sreekrishnapuram Block Panchayat',
-    'Sulthan Bathery Block Panchayat',
-    'Tanur Block Panchayat',
-    'Thalassery Block Panchayat',
-    'Thalikulam Block Panchayat',
-    'Thalipparamba Block Panchayat',
-    'Thodannur Block Panchayat',
-    'Thodupuzha Block Panchayat',
-    'Thycattussery Block Panchayat',
-    'Tirur Block Panchayat',
-    'Tirurangadi Block Panchayat',
-    'Trithala Block Panchayat',
-    'Tuneri Block Panchayat',
-    'Uzhavoor Block Panchayat',
-    'Vadavucode Block Panchayat',
-    'Vaikom Block Panchayat',
-    'Vamanapuram Block Panchayat',
-    'Varkala Block Panchayat',
-    'Vatakara Block Panchayat',
-    'Vazhakulam Block Panchayat',
-    'Vazhoor Block Panchayat',
-    'Veliyanad Block Panchayat',
-    'Vellanad Block Panchayat',
-    'Vellangallur Block Panchayat',
-    'Vengara Block Panchayat',
-    'Vettikavala Block Panchayat',
-    'Vypin Block Panchayat',
-    'Wadakanchery Block Panchayat',
-    'Wandoor Block Panchayat',
+    'Nileswaram Block Panchayat',
     // Panchayaths
     'Abdurahiman Nagar',
     'Adat',
@@ -1333,7 +1341,13 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
         setSearchQuery(query);
         if (query.length > 1) {
             const filteredSuggestions = keralaLocations
-                .filter(location => location.toLowerCase().includes(query.toLowerCase()))
+                .filter(location => 
+                    location.toLowerCase().includes(query.toLowerCase()) &&
+                    (location.includes(' Block Panchayat') || // Blocks
+                     location.includes('Corporation') || // ULB Corporations
+                     location.includes('Municipality') || // ULB Municipalities
+                     (!location.includes('Corporation') && !location.includes('Municipality') && !location.includes(' Block Panchayat'))) // Panchayaths
+                )
                 .map(formatSuggestion);
             setSuggestions(filteredSuggestions);
         } else {
@@ -1882,7 +1896,13 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                                 {searchResults.map(video => (
                                     <div key={video.id} className="group relative" onClick={() => openModal(video)}>
                                         <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg">
-                                            <img src={video.thumbnailUrl} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Video thumbnail" />
+                                            <img 
+                                                src={video.thumbnailUrl} 
+                                                className={`w-full h-full transition-transform duration-300 group-hover:scale-110 ${
+                                                    (video.mediaType === 'story' || video.mediaType === 'poem') ? 'object-contain' : 'object-cover'
+                                                }`}
+                                                alt="Video thumbnail" 
+                                            />
                                             <div className="absolute inset-0 bg-gradient-to-t from-teal-800/80 via-transparent to-black/20"></div>
                                             <div className="absolute top-3 left-3 flex items-center gap-1 text-white text-xs bg-black/30 px-2 py-1 rounded-full">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
@@ -1913,7 +1933,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                     onClick={closeModal}
                 >
                     <div 
-                        className={`bg-white rounded-2xl md:rounded-3xl overflow-hidden max-w-4xl w-full relative transition-all duration-200 ${isModalClosing ? 'opacity-0 scale-95 translate-y-2' : 'opacity-100 scale-100 translate-y-0'} md:h-[90vh] max-h-screen flex flex-col`}
+                        className={`bg-white rounded-2xl md:rounded-3xl overflow-hidden max-w-4xl w-full relative transition-all duration-200 ${isModalClosing ? 'opacity-0 scale-95 translate-y-2' : 'opacity-100 scale-100 translate-y-0'} h-[80vh] md:h-[90vh] max-h-screen flex flex-col`}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button type="button" aria-label="Close" className="absolute z-20 top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full w-10 h-10 flex items-center justify-center text-3xl leading-none" onClick={closeModal}>
@@ -1923,7 +1943,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                         </button>
                         <div className="w-full bg-black flex-1 flex items-center justify-center relative">
                             {selectedVideo.mediaType === 'video' && (
-                                <video controls preload="metadata" poster={selectedVideo.thumbnailUrl} className="max-w-full max-h-full w-auto h-auto object-contain">
+                                <video controls preload="metadata" poster={selectedVideo.thumbnailUrl} className="w-full h-full object-contain">
                                     <source src={selectedVideo.videoUrl} />
                                 </video>
                             )}
@@ -1931,29 +1951,27 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                                 <img 
                                     src={selectedVideo.imageUrl || selectedVideo.thumbnailUrl} 
                                     alt={selectedVideo.name}
-                                    className="max-w-full max-h-full w-auto h-auto object-contain"
+                                    className="w-full h-full object-contain"
+                                    style={{ 
+                                        objectFit: 'contain',
+                                        width: '100%',
+                                        height: '100%',
+                                        maxHeight: '100%'
+                                    }}
                                 />
                             )}
                             {(selectedVideo.mediaType === 'story' || selectedVideo.mediaType === 'poem') && selectedVideo.storyImages && (
-                                <div className="relative w-full h-full flex items-center justify-center">
+                                <div className="relative w-full flex-1 flex items-center justify-center">
                                     <img 
                                         key={`${selectedVideo.id}-${currentPage}`}
                                         src={selectedVideo.storyImages[currentPage]?.url || selectedVideo.thumbnailUrl} 
                                         alt={`${selectedVideo.name} - Page ${currentPage + 1}`}
-                                        className="max-w-full max-h-full w-auto h-auto"
+                                        className="w-full h-full object-contain"
                                         style={{ 
                                             objectFit: 'contain',
-                                            width: 'auto',
-                                            height: 'auto',
-                                            maxWidth: '100%',
+                                            width: '100%',
+                                            height: '100%',
                                             maxHeight: '100%'
-                                        }}
-                                        onLoad={(e) => {
-                                            // Ensure consistent sizing for all images
-                                            const img = e.target as HTMLImageElement;
-                                            img.style.objectFit = 'contain';
-                                            img.style.width = 'auto';
-                                            img.style.height = 'auto';
                                         }}
                                     />
                                     

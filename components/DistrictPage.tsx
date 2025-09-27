@@ -48,6 +48,11 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
 
     const classify = (label: string): { base: string; kind: 'panchayath' | 'block' | 'municipality' | 'corporation' } => {
         const v = label.trim();
+        // Handle formatted suggestions (e.g., "Adimaly - Block")
+        if (v.includes(' - Corporation')) return { base: v.replace(' - Corporation', ''), kind: 'corporation' };
+        if (v.includes(' - Municipality')) return { base: v.replace(' - Municipality', ''), kind: 'municipality' };
+        if (v.includes(' - Block')) return { base: v.replace(' - Block', ''), kind: 'block' };
+        // Handle original format (e.g., "Adimaly Block Panchayat")
         if (v.includes('Municipal Corporation')) return { base: v.replace(' Municipal Corporation', ''), kind: 'corporation' };
         if (v.includes(' Corporation')) return { base: v.replace(' Corporation', ''), kind: 'corporation' };
         if (v.includes('Municipality')) return { base: v.replace(' Municipality', ''), kind: 'municipality' };
@@ -55,15 +60,264 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
         return { base: v, kind: 'panchayath' };
     };
 
-    // Reuse the static list from Spotlight logic for suggestions (lightweight)
+    // Comprehensive list of Kerala's Local Self Government Institutions for suggestions
+    const keralaLocations = [
+        // Urban Localbodies - Municipal Corporations
+        'Thiruvananthapuram Corporation',
+        'Kollam Corporation',
+        'Kochi Corporation',
+        'Thrissur Corporation',
+        'Kozhikode Corporation',
+        'Kannur Corporation',
+        // Municipalities
+        'Varkala Municipality',
+        'Attingal Municipality',
+        'Nedumangad Municipality',
+        'Neyyattinkara Municipality',
+        'Punalur Municipality',
+        'Paravur Municipality',
+        'Karunagappally Municipality',
+        'Kottarakkara Municipality',
+        'Adoor Municipality',
+        'Thiruvalla Municipality',
+        'Pathanamthitta Municipality',
+        'Alappuzha Municipality',
+        'Cherthala Municipality',
+        'Kayamkulam Municipality',
+        'Mavelikkara Municipality',
+        'Chengannur Municipality',
+        'Kottayam Municipality',
+        'Changanassery Municipality',
+        'Vaikom Municipality',
+        'Thodupuzha Municipality',
+        'Kattappana Municipality',
+        'Aluva Municipality',
+        'Angamaly Municipality',
+        'Eloor Municipality',
+        'Kalamassery Municipality',
+        'Kothamangalam Municipality',
+        'Maradu Municipality',
+        'Muvattupuzha Municipality',
+        'Paravur Municipality',
+        'Perumbavoor Municipality',
+        'Thrikkakara Municipality',
+        'Thrippunithura Municipality',
+        'Chalakudy Municipality',
+        'Guruvayoor Municipality',
+        'Irinjalakuda Municipality',
+        'Kodungallur Municipality',
+        'Chittur-Thathamangalam Municipality',
+        'Ottappalam Municipality',
+        'Palakkad Municipality',
+        'Shoranur Municipality',
+        'Kondotty Municipality',
+        'Kottakkal Municipality',
+        'Malappuram Municipality',
+        'Manjeri Municipality',
+        'Nilambur Municipality',
+        'Perinthalmanna Municipality',
+        'Ponnani Municipality',
+        'Tirur Municipality',
+        'Valanchery Municipality',
+        'Koyilandy Municipality',
+        'Vadakara Municipality',
+        'Payyannur Municipality',
+        'Taliparamba Municipality',
+        'Iritty Municipality',
+        'Mattannur Municipality',
+        'Anthoor Municipality',
+        'Panoor Municipality',
+        'Sreekandapuram Municipality',
+        'Kuthuparamba Municipality',
+        'Mananthavady Municipality',
+        'Sulthan Bathery Municipality',
+        'Kanhangad Municipality',
+        'Kasaragod Municipality',
+        'Nileshwar Municipality',
+        'Koothattukulam Municipality',
+        'Piravom Municipality',
+        'Feroke Municipality',
+        'Mukkam Municipality',
+        'Payyoli Municipality',
+        'Ramanattukara Municipality',
+        'Parappanangadi Municipality',
+        'Cherpulassery Municipality',
+        'Shoranur Municipality',
+        'Kunnamkulam Municipality',
+        // Block Panchayats (exact names from block-username.csv)
+        'Varkala Block Panchayat',
+        'Kilimanoor Block Panchayat',
+        'Chirayinkeezhu Block Panchayat',
+        'Vamanapuram Block Panchayat',
+        'Vellanad Block Panchayat',
+        'Nedumangad Block Panchayat',
+        'Pothencode Block Panchayat',
+        'Nemom Block Panchayat',
+        'Perumkadavila Block Panchayat',
+        'Athiyannoor Block Panchayat',
+        'Parassala Block Panchayat',
+        'Oachira Block Panchayat',
+        'Sasthamcotta Block Panchayat',
+        'Vettikavala Block Panchayat',
+        'Pathanapuram Block Panchayat',
+        'Anchal Block Panchayat',
+        'Kottarakara Block Panchayat',
+        'Chittumala Block Panchayat',
+        'Chavara Block Panchayat',
+        'Mukhathala Block Panchayat',
+        'Ithikkara Block Panchayat',
+        'Chadayamangalam Block Panchayat',
+        'Mallappally Block Panchayat',
+        'Pulikeezhu Block Panchayat',
+        'Koipuram Block Panchayat',
+        'Elanthoor Block Panchayat',
+        'Ranni Block Panchayat',
+        'Konni Block Panchayat',
+        'Pandalam Block Panchayat',
+        'Parakkode Block Panchayat',
+        'Thycattussery Block Panchayat',
+        'Pattanakkad Block Panchayat',
+        'Kanjikuzhy Block Panchayat',
+        'Aryad Block Panchayat',
+        'Ambalappuzha Block Panchayat',
+        'Champakulam Block Panchayat',
+        'Veliyanad Block Panchayat',
+        'Chengannur Block Panchayat',
+        'Haripad Block Panchayat',
+        'Mavelikara Block Panchayat',
+        'Bharanickavu Block Panchayat',
+        'Muthukulam Block Panchayat',
+        'Vaikom Block Panchayat',
+        'Kaduthuruthy Block Panchayat',
+        'Ettumanoor Block Panchayat',
+        'Uzhavoor Block Panchayat',
+        'Lalam Block Panchayat',
+        'Erattupetta Block Panchayat',
+        'Pampady Block Panchayat',
+        'Pallom Block Panchayat',
+        'Madappally Block Panchayat',
+        'Vazhoor Block Panchayat',
+        'Kanjirappally Block Panchayat',
+        'Adimaly Block Panchayat',
+        'Devikulam Block Panchayat',
+        'Nedumkandam Block Panchayat',
+        'Elemdesam Block Panchayat',
+        'Idukki Block Panchayat',
+        'Kattappana Block Panchayat',
+        'Thodupuzha Block Panchayat',
+        'Azhutha Block Panchayat',
+        'Paravur Block Panchayat',
+        'Alangad Block Panchayat',
+        'Angamaly Block Panchayat',
+        'Koovappady Block Panchayat',
+        'Vazhakulam Block Panchayat',
+        'Edappally Block Panchayat',
+        'Vypin Block Panchayat',
+        'Palluruthy Block Panchayat',
+        'Mulanthuruthy Block Panchayat',
+        'Vadavucode Block Panchayat',
+        'Kothamangalam Block Panchayat',
+        'Pampakuda Block Panchayat',
+        'Parakkadavu Block Panchayat',
+        'Muvattupuzha Block Panchayat',
+        'Chavakkad Block Panchayat',
+        'Chowannur Block Panchayat',
+        'Wadakanchery Block Panchayat',
+        'Pazhayannur Block Panchayat',
+        'Ollukkara Block Panchayat',
+        'Puzhakkal Block Panchayat',
+        'Mullassery Block Panchayat',
+        'Thalikulam Block Panchayat',
+        'Anthikad Block Panchayat',
+        'Cherpu Block Panchayat',
+        'Kodakara Block Panchayat',
+        'Irinjalakuda Block Panchayat',
+        'Vellangallur Block Panchayat',
+        'Mathilakam Block Panchayat',
+        'Mala Block Panchayat',
+        'Chalakudy Block Panchayat',
+        'Trithala Block Panchayat',
+        'Pattambi Block Panchayat',
+        'Ottapalam Block Panchayat',
+        'Sreekrishnapuram Block Panchayat',
+        'Mannarkad Block Panchayat',
+        'Attappady Block Panchayat',
+        'Palakkad Block Panchayat',
+        'Kuzhalmannam Block Panchayat',
+        'Chittur Block Panchayat',
+        'Kollengode Block Panchayat',
+        'Nemmara Block Panchayat',
+        'Alathur Block Panchayat',
+        'Malampuzha Block Panchayat',
+        'Nilambur Block Panchayat',
+        'Kalikavu Block Panchayat',
+        'Wandoor Block Panchayat',
+        'Kondotty Block Panchayat',
+        'Areacode Block Panchayat',
+        'Malappuram Block Panchayat',
+        'Perinthalmanna Block Panchayat',
+        'Mankada Block Panchayat',
+        'Kuttippuram Block Panchayat',
+        'Vengara Block Panchayat',
+        'Tirurangadi Block Panchayat',
+        'Tanur Block Panchayat',
+        'Tirur Block Panchayat',
+        'Ponnani Block Panchayat',
+        'Perumpadappa Block Panchayat',
+        'Vatakara Block Panchayat',
+        'Tuneri Block Panchayat',
+        'Kunnummal Block Panchayat',
+        'Thodannur Block Panchayat',
+        'Melady Block Panchayat',
+        'Perambra Block Panchayat',
+        'Balussery Block Panchayat',
+        'Panthalayani Block Panchayat',
+        'Chelannur Block Panchayat',
+        'Koduvally Block Panchayat',
+        'Kunnamangalam Block Panchayat',
+        'Kozhikkode Block Panchayat',
+        'Mananthavady Block Panchayat',
+        'Panamaram Block Panchayat',
+        'Sulthan Bathery Block Panchayat',
+        'Kalpetta Block Panchayat',
+        'Payyannur Block Panchayat',
+        'Kalliasseri Block Panchayat',
+        'Thalipparamba Block Panchayat',
+        'Irikkur Block Panchayat',
+        'Kannur Block Panchayat',
+        'Edakkad Block Panchayat',
+        'Thalassery Block Panchayat',
+        'Panoor Block Panchayat',
+        'Kuthuparamba Block Panchayat',
+        'Iritty Block Panchayat',
+        'Peravoor Block Panchayat',
+        'Manjesaram Block Panchayat',
+        'Karadka Block Panchayat',
+        'Kasaragod Block Panchayat',
+        'Kanhangad Block Panchayat',
+        'Parappa Block Panchayat',
+        'Nileswaram Block Panchayat'
+    ];
+
+    const classifyLocation = (label: string): { baseName: string; kind: 'panchayath' | 'block' | 'municipality' | 'corporation' } => {
+        const v = label.trim();
+        if (v.includes('Municipal Corporation')) return { baseName: v.replace(' Municipal Corporation', ''), kind: 'corporation' };
+        if (v.includes(' Corporation')) return { baseName: v.replace(' Corporation', ''), kind: 'corporation' };
+        if (v.includes('Municipality')) return { baseName: v.replace(' Municipality', ''), kind: 'municipality' };
+        if (v.includes(' Block Panchayat')) return { baseName: v.replace(' Block Panchayat', ''), kind: 'block' };
+        return { baseName: v, kind: 'panchayath' };
+    };
+
+    const formatSuggestion = (raw: string): string => {
+        const c = classifyLocation(raw);
+        if (c.kind === 'corporation') return `${c.baseName} - Corporation`;
+        if (c.kind === 'municipality') return `${c.baseName} - Municipality`;
+        if (c.kind === 'block') return `${c.baseName} - Block`;
+        return `${c.baseName} - Panchayath`;
+    };
+
     const locationPool = useMemo(() => {
-        // Lightweight list tailored for district page: blocks, municipalities, corporations, and panchayaths labels
-        // For simplicity, we include generic labels; can be scoped by district later
-        const list: string[] = [];
-        // Block labels example (user can type exact names)
-        list.push('Block Panchayat');
-        // Users typically type proper names; suggestions are optional here
-        return list;
+        return keralaLocations;
     }, []);
 
     const openModal = (video: ResultVideo) => {
@@ -124,17 +378,7 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
         return () => window.removeEventListener('keydown', onKey);
     }, [isModalOpen, selectedVideo, currentPage]);
 
-    // Auto-search for ULB content when district is Urban Localbodies or when it's a ULB district
-    React.useEffect(() => {
-        if (districtName === 'Urban Localbodies') {
-            // Auto-search for ULB content
-            runSearch('Urban Localbodies');
-        } else {
-            // For other districts, try to search for ULB content with the district name
-            // This will help find ULB stories for districts like Alappuzha
-            runSearch(districtName);
-        }
-    }, [districtName]);
+    // Removed auto-search to show block dropdowns immediately when district is clicked
 
     return (
         <div className="bg-white">
@@ -173,8 +417,20 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
                             onChange={(e) => {
                                 const q = e.target.value;
                                 setQuery(q);
-                                if (q.length > 1 && locationPool.length > 0) {
-                                    setSuggestions(locationPool.filter(l => l.toLowerCase().includes(q.toLowerCase())));
+                                if (q.length > 1) {
+                                    const filteredSuggestions = keralaLocations
+                                        .filter(location => {
+                                            const matchesQuery = location.toLowerCase().includes(q.toLowerCase());
+                                            if (districtName === 'Urban Localbodies') {
+                                                // For ULB district, only suggest ULB (Corporations and Municipalities)
+                                                return matchesQuery && (location.includes('Corporation') || location.includes('Municipality'));
+                                            } else {
+                                                // For regular districts, only suggest blocks
+                                                return matchesQuery && location.includes(' Block Panchayat');
+                                            }
+                                        })
+                                        .map(formatSuggestion);
+                                    setSuggestions(filteredSuggestions);
                                 } else {
                                     setSuggestions([]);
                                 }
@@ -194,7 +450,11 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
                             <div className="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                 <ul className="divide-y divide-gray-100">
                                     {suggestions.slice(0, 10).map((s, i) => (
-                                        <li key={i} className="px-4 py-3 cursor-pointer hover:bg-teal-50 text-left text-gray-700" onClick={() => { setQuery(s); setSuggestions([]); runSearch(s); }}>{s}</li>
+                                        <li key={i} className="px-4 py-3 cursor-pointer hover:bg-teal-50 text-left text-gray-700" onClick={() => { 
+                                            setQuery(s); 
+                                            setSuggestions([]); 
+                                            runSearch(s); // Pass the full formatted suggestion
+                                        }}>{s}</li>
                                     ))}
                                 </ul>
                             </div>
@@ -221,7 +481,13 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
                                 {results.map(video => (
                                     <div key={video.id} className="group relative" onClick={() => openModal(video)}>
                                         <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg">
-                                            <img src={video.thumbnailUrl} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Media thumbnail" />
+                                            <img 
+                                                src={video.thumbnailUrl} 
+                                                className={`w-full h-full transition-transform duration-300 group-hover:scale-110 ${
+                                                    (video.mediaType === 'story' || video.mediaType === 'poem') ? 'object-contain' : 'object-cover'
+                                                }`}
+                                                alt="Media thumbnail" 
+                                            />
                                             <div className="absolute inset-0 bg-gradient-to-t from-teal-800/80 via-transparent to-black/20"></div>
                                             <div className="absolute top-3 left-3 flex items-center gap-1 text-white text-xs bg-black/30 px-2 py-1 rounded-full">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
@@ -264,7 +530,7 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
                     onClick={closeModal}
                 >
                     <div 
-                        className={`bg-white rounded-2xl md:rounded-3xl overflow-hidden max-w-4xl w-full relative transition-all duration-200 ${isModalClosing ? 'opacity-0 scale-95 translate-y-2' : 'opacity-100 scale-100 translate-y-0'} md:h-[90vh] max-h-screen flex flex-col`}
+                        className={`bg-white rounded-2xl md:rounded-3xl overflow-hidden max-w-4xl w-full relative transition-all duration-200 ${isModalClosing ? 'opacity-0 scale-95 translate-y-2' : 'opacity-100 scale-100 translate-y-0'} h-[80vh] md:h-[90vh] max-h-screen flex flex-col`}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button type="button" aria-label="Close" className="absolute z-20 top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full w-10 h-10 flex items-center justify-center text-3xl leading-none" onClick={closeModal}>
@@ -274,7 +540,7 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
                         </button>
                         <div className="w-full bg-black flex-1 flex items-center justify-center relative">
                             {selectedVideo.mediaType === 'video' && (
-                                <video controls preload="metadata" poster={selectedVideo.thumbnailUrl} className="max-w-full max-h-full w-auto h-auto object-contain">
+                                <video controls preload="metadata" poster={selectedVideo.thumbnailUrl} className="w-full h-full object-contain">
                                     <source src={selectedVideo.videoUrl} />
                                 </video>
                             )}
@@ -282,29 +548,27 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
                                 <img 
                                     src={selectedVideo.imageUrl || selectedVideo.thumbnailUrl} 
                                     alt={selectedVideo.name}
-                                    className="max-w-full max-h-full w-auto h-auto object-contain"
+                                    className="w-full h-full object-contain"
+                                    style={{ 
+                                        objectFit: 'contain',
+                                        width: '100%',
+                                        height: '100%',
+                                        maxHeight: '100%'
+                                    }}
                                 />
                             )}
                             {(selectedVideo.mediaType === 'story' || selectedVideo.mediaType === 'poem') && selectedVideo.storyImages && (
-                                <div className="relative w-full h-full flex items-center justify-center">
+                                <div className="relative w-full flex-1 flex items-center justify-center">
                                     <img 
                                         key={`${selectedVideo.id}-${currentPage}`}
                                         src={selectedVideo.storyImages[currentPage]?.url || selectedVideo.thumbnailUrl} 
                                         alt={`${selectedVideo.name} - Page ${currentPage + 1}`}
-                                        className="max-w-full max-h-full w-auto h-auto"
+                                        className="w-full h-full object-contain"
                                         style={{ 
                                             objectFit: 'contain',
-                                            width: 'auto',
-                                            height: 'auto',
-                                            maxWidth: '100%',
+                                            width: '100%',
+                                            height: '100%',
                                             maxHeight: '100%'
-                                        }}
-                                        onLoad={(e) => {
-                                            // Ensure consistent sizing for all images
-                                            const img = e.target as HTMLImageElement;
-                                            img.style.objectFit = 'contain';
-                                            img.style.width = 'auto';
-                                            img.style.height = 'auto';
                                         }}
                                     />
                                     
@@ -449,12 +713,7 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
                         storyImages: m.storyImages,
                     };
                 })
-                .filter(v => v.videoUrl || v.imageUrl || (v.storyImages && v.storyImages.length > 0))
-                .filter(v => {
-                    if (districtName === 'Urban Localbodies') return true;
-                    const normalize = (s: string) => s.trim().toLowerCase();
-                    return normalize(v.district) === normalize(districtName);
-                });
+                .filter(v => v.videoUrl || v.imageUrl || (v.storyImages && v.storyImages.length > 0));
 
             setResults(mapped);
             setShowResults(true);

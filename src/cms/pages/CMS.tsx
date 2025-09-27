@@ -373,8 +373,8 @@ export default function CMS() {
       let videoUrl: string | null = null
       // Determine target location strings
       const currentDistrict = form.district || userMeta?.district || ''
-      // For Super Admin with ULB, folder should be district/<municipalityname + 'ulb'> e.g., aluvaulb
-      const ulbFolder = (isSuperAdmin && form.areaType === 'ulb')
+      // For ULB area type, folder should be district/<municipalityname + 'ulb'> e.g., aluvaulb
+      const ulbFolder = (form.areaType === 'ulb')
         ? (form.ulb || '')
             .toLowerCase()
             .replace(/[^a-z0-9]/gi, '')
