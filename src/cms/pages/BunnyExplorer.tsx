@@ -16,7 +16,17 @@ export default function BunnyExplorer() {
       const data = await listBunnyDirectory(p)
       setEntries(data)
     } catch (e: any) {
-      setError(e.message || 'Failed to load directory')
+      console.error('[BunnyExplorer] Load error:', e)
+      const errorMessage = e.message || 'Failed to load directory'
+      
+      // Check if it's a configuration error
+      if (errorMessage.includes('Missing Bunny CDN configuration')) {
+        setError(`Configuration Error: ${errorMessage}. Please check your environment variables.`)
+      } else if (errorMessage.includes('Invalid JSON response')) {
+        setError(`API Error: ${errorMessage}. The Bunny CDN API may be misconfigured.`)
+      } else {
+        setError(errorMessage)
+      }
     } finally {
       setLoading(false)
     }

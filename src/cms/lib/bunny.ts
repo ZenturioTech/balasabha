@@ -74,34 +74,24 @@ export type BunnyEntry = {
 export async function listBunnyDirectory(path: string = ''): Promise<BunnyEntry[]> {
   const normalizedPath = path ? path.replace(/^\/+|\/+$/g, '') + '/' : ''
 
-  if (import.meta.env.PROD) {
-    const url = `/api/bunny/list?path=${encodeURIComponent(path || '')}`
-    try { console.debug('[Bunny] List via API', { normalizedPath: `/${normalizedPath}`, url }) } catch {}
-    const res = await fetch(url, { method: 'GET' })
-    if (!res.ok) {
-      const text = await res.text().catch(() => '')
-      try { console.debug('[Bunny] List failed (api)', { status: res.status, statusText: res.statusText, body: text?.slice(0, 300) }) } catch {}
-      throw new Error(`Bunny list failed: ${res.status} ${text}`)
-    }
-    const data = await res.json()
-    return (data || []).map((e: any) => ({
-      guid: e.Guid,
-      path: e.Path,
-      objectName: e.ObjectName,
-      isDirectory: Boolean(e.IsDirectory),
-      size: Number(e.Length || 0),
-      lastChanged: e.LastChanged,
-    }))
-  }
-
-  // DEV: keep direct call behavior
+  // Check for required environment variables
   const apiKey = String(import.meta.env.VITE_BUNNY_API_KEY || '').trim()
   const storageZone = String(import.meta.env.VITE_BUNNY_STORAGE_ZONE || '').trim()
   const hostname = String(import.meta.env.VITE_BUNNY_HOSTNAME || '').trim()
-  if (!apiKey || !storageZone || !hostname) throw new Error('Missing Bunny env configuration')
+  
+  if (!apiKey || !storageZone || !hostname) {
+    const missingVars = []
+    if (!apiKey) missingVars.push('VITE_BUNNY_API_KEY')
+    if (!storageZone) missingVars.push('VITE_BUNNY_STORAGE_ZONE')
+    if (!hostname) missingVars.push('VITE_BUNNY_HOSTNAME')
+    throw new Error(`Missing Bunny CDN configuration: ${missingVars.join(', ')}. Please set these environment variables.`)
+  }
+
   const url = `https://${hostname}/${storageZone}/${normalizedPath}`
+  
   try {
-    console.debug('[Bunny] List direct (dev)', {
+    console.debug('[Bunny] List directory', {
+      mode: import.meta.env.MODE,
       host: hostname,
       storageZone,
       normalizedPath: `/${normalizedPath}`,
@@ -109,16 +99,37 @@ export async function listBunnyDirectory(path: string = ''): Promise<BunnyEntry[
       apiKeyLength: apiKey.length,
     })
   } catch {}
+  
   const res = await fetch(url, {
     method: 'GET',
-    headers: { AccessKey: apiKey, Accept: 'application/json' } as any,
+    headers: { 
+      AccessKey: apiKey, 
+      Accept: 'application/json' 
+    } as any,
   })
+  
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    try { console.debug('[Bunny] List failed (dev)', { status: res.status, statusText: res.statusText, body: text?.slice(0, 300) }) } catch {}
-    throw new Error(`Bunny list failed: ${res.status} ${text}`)
+    try { 
+      console.debug('[Bunny] List failed', { 
+        status: res.status, 
+        statusText: res.statusText, 
+        body: text?.slice(0, 300),
+        url 
+      }) 
+    } catch {}
+    throw new Error(`Bunny CDN list failed: ${res.status} ${res.statusText}. ${text ? `Response: ${text.slice(0, 100)}` : ''}`)
   }
-  const data = await res.json()
+  
+  let data
+  try {
+    data = await res.json()
+  } catch (parseError) {
+    const text = await res.text().catch(() => '')
+    console.error('[Bunny] JSON parse error', { parseError, responseText: text?.slice(0, 200) })
+    throw new Error(`Invalid JSON response from Bunny CDN. Response: ${text?.slice(0, 100)}`)
+  }
+  
   return (data || []).map((e: any) => ({
     guid: e.Guid,
     path: e.Path,

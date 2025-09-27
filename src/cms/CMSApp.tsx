@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import './App.css'
 import { supabase } from '../../services/supabaseClient'
 import { Link, Route, Routes, Navigate, useLocation } from 'react-router-dom'
@@ -53,8 +53,18 @@ function CMSApp() {
     superAdminEmail: import.meta.env.VITE_SUPERADMIN_EMAIL,
     userEmail: userEmail,
     isSuperAdmin: isSuperAdmin,
-    currentPath: location.pathname
+    currentPath: location.pathname,
+    envVarsPresent: {
+      VITE_SUPABASE_URL: !!import.meta.env.VITE_SUPABASE_URL,
+      VITE_SUPABASE_ANON_KEY: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
+      VITE_SUPERADMIN_EMAIL: !!import.meta.env.VITE_SUPERADMIN_EMAIL
+    }
   })
+
+  // Show error if critical env vars are missing
+  if (isSignedIn && !superAdminEmail) {
+    console.error('[CMSApp] VITE_SUPERADMIN_EMAIL environment variable is not set!')
+  }
 
   return (
     <div className="cms-container">
@@ -101,6 +111,11 @@ function CMSApp() {
       {error && (
         <div style={{ color: 'red', padding: '1rem', textAlign: 'center' }}>
           Error: {error}
+        </div>
+      )}
+      {isSignedIn && !superAdminEmail && (
+        <div style={{ color: 'orange', padding: '1rem', textAlign: 'center', backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '8px', margin: '1rem 0' }}>
+          ⚠️ Admin configuration missing. Please set VITE_SUPERADMIN_EMAIL environment variable.
         </div>
       )}
       {!isSignedIn && (
