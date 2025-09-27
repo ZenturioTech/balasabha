@@ -10,6 +10,12 @@ type RawMetadata = {
     mediaType?: string;
     thumbnailUrl?: string;
     videoUrl?: string;
+    imageUrl?: string;
+    storyImages?: Array<{
+        page: number;
+        url: string;
+        filename: string;
+    }>;
     createdAt?: string;
 };
 
@@ -31,6 +37,13 @@ type SpotlightVideo = {
     wardLabel: string;
     thumbnailUrl: string;
     videoUrl: string;
+    mediaType: string;
+    imageUrl?: string;
+    storyImages?: Array<{
+        page: number;
+        url: string;
+        filename: string;
+    }>;
 };
 
 const MOBILE_TILE_COUNT = 8;
@@ -1249,6 +1262,8 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
     const [selectedVideo, setSelectedVideo] = useState<SpotlightVideo | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isModalClosing, setIsModalClosing] = useState<boolean>(false);
+    const [currentPage, setCurrentPage] = useState<number>(0);
+    const [showSlideHint, setShowSlideHint] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -1377,6 +1392,15 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
 
             const { data, error: fetchError } = await query;
             if (fetchError) throw fetchError;
+            
+            // Debug: log search results
+            console.log('[Spotlight] Search results', { 
+                name, 
+                resolvedKind, 
+                pattern: resolvedKind === 'municipality' ? `${name.toLowerCase()}ulb` : 'N/A',
+                resultCount: data?.length,
+                sampleResults: data?.slice(0, 3)
+            });
 
             const toTitleCase = (input: string): string => {
                 return input
@@ -1387,6 +1411,14 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
             };
 
             const mapped: SpotlightVideo[] = (data as any[])
+                .filter((row) => {
+                    const mt = (row.metadata as any)?.mediaType;
+                    const isValid = mt && ['video', 'image', 'story', 'poem'].includes(String(mt).toLowerCase());
+                    if (mt) {
+                        console.log('[Spotlight] Media type found:', { mediaType: mt, isValid, name: row.metadata?.name });
+                    }
+                    return isValid;
+                })
                 .map((row) => {
                     const m = row.metadata ?? {};
                     const district = (m.district || row.district || '').toString();
@@ -1402,17 +1434,34 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                     }
                     const wardRaw = m.ward ?? '';
                     const wardLabel = wardRaw ? `Ward ${wardRaw}` : '';
+                    const mediaType = (m.mediaType || 'video').toString();
+                    
+                    // Get appropriate thumbnail/display image
+                    let thumbnailUrl = '/images/girlw.png';
+                    if (mediaType === 'video' && m.thumbnailUrl) {
+                        thumbnailUrl = m.thumbnailUrl;
+                    } else if (mediaType === 'image' && m.imageUrl) {
+                        thumbnailUrl = m.imageUrl;
+                    } else if ((mediaType === 'story' || mediaType === 'poem') && m.storyImages && m.storyImages.length > 0) {
+                        thumbnailUrl = m.storyImages[0].url;
+                    } else if (m.imageUrl) {
+                        thumbnailUrl = m.imageUrl;
+                    }
+                    
                     return {
                         id: String(row.id),
                         name: (m.name || row.username || 'Participant').toString(),
                         district,
                         panchayath: panch,
                         wardLabel,
-                        thumbnailUrl: (m.thumbnailUrl || '/images/girlw.png').toString(),
+                        thumbnailUrl,
                         videoUrl: (m.videoUrl || '').toString(),
+                        mediaType,
+                        imageUrl: m.imageUrl,
+                        storyImages: m.storyImages,
                     };
                 })
-                .filter(v => v.videoUrl);
+                .filter(v => v.videoUrl || v.imageUrl || (v.storyImages && v.storyImages.length > 0));
 
             // Store full results and display results page
             setSearchResults(uniqueById(mapped));
@@ -1508,14 +1557,31 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                     }
                     const wardRaw = m.ward ?? '';
                     const wardLabel = wardRaw ? `Ward ${wardRaw}` : '';
+                    const mediaType = (m.mediaType || 'video').toString();
+                    
+                    // Get appropriate thumbnail/display image
+                    let thumbnailUrl = '/images/girlw.png';
+                    if (mediaType === 'video' && m.thumbnailUrl) {
+                        thumbnailUrl = m.thumbnailUrl;
+                    } else if (mediaType === 'image' && m.imageUrl) {
+                        thumbnailUrl = m.imageUrl;
+                    } else if ((mediaType === 'story' || mediaType === 'poem') && m.storyImages && m.storyImages.length > 0) {
+                        thumbnailUrl = m.storyImages[0].url;
+                    } else if (m.imageUrl) {
+                        thumbnailUrl = m.imageUrl;
+                    }
+                    
                     return {
                         id: String(row.id),
                         name: (m.name || row.username || 'Participant').toString(),
                         district,
                         panchayath: panch,
                         wardLabel,
-                        thumbnailUrl: (m.thumbnailUrl || '/images/girlw.png').toString(),
+                        thumbnailUrl,
                         videoUrl: (m.videoUrl || '').toString(),
+                        mediaType,
+                        imageUrl: m.imageUrl,
+                        storyImages: m.storyImages,
                     };
                 }).filter(v => v.videoUrl);
 
@@ -1587,12 +1653,21 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
     
     const openModal = (video: SpotlightVideo) => {
         setSelectedVideo(video);
+        setCurrentPage(0);
         setIsModalClosing(false);
         setIsModalOpen(true);
+        
+        // Show slide hint for stories/poems with multiple pages
+        if ((video.mediaType === 'story' || video.mediaType === 'poem') && video.storyImages && video.storyImages.length > 1) {
+            setShowSlideHint(true);
+            setTimeout(() => setShowSlideHint(false), 3000);
+        }
     };
 
     const closeModal = () => {
         setIsModalClosing(true);
+        setCurrentPage(0);
+        setShowSlideHint(false);
         // Allow transition to play before unmounting
         window.setTimeout(() => {
             setIsModalOpen(false);
@@ -1601,15 +1676,37 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
         }, 200);
     };
 
+    const nextPage = () => {
+        if (selectedVideo?.storyImages && currentPage < selectedVideo.storyImages.length - 1) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const prevPage = () => {
+        if (currentPage > 0) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
             if (e.key === 'Escape' && isModalOpen) {
                 closeModal();
             }
+            if (isModalOpen && selectedVideo && (selectedVideo.mediaType === 'story' || selectedVideo.mediaType === 'poem')) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevPage();
+                }
+                if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    nextPage();
+                }
+            }
         };
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
-    }, [isModalOpen]);
+    }, [isModalOpen, selectedVideo, currentPage]);
     
     return (
         <section id="interactive-section" ref={interactiveSectionRef} className="pt-8 md:pt-16 pb-8 px-6 text-center">
@@ -1824,10 +1921,81 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                                 ×
                             </span>
                         </button>
-                        <div className="w-full bg-black flex-1 flex items-center justify-center">
-                            <video controls preload="metadata" poster={selectedVideo.thumbnailUrl} className="max-w-full max-h-full w-auto h-auto object-contain">
-                                <source src={selectedVideo.videoUrl} />
-                            </video>
+                        <div className="w-full bg-black flex-1 flex items-center justify-center relative">
+                            {selectedVideo.mediaType === 'video' && (
+                                <video controls preload="metadata" poster={selectedVideo.thumbnailUrl} className="max-w-full max-h-full w-auto h-auto object-contain">
+                                    <source src={selectedVideo.videoUrl} />
+                                </video>
+                            )}
+                            {selectedVideo.mediaType === 'image' && (
+                                <img 
+                                    src={selectedVideo.imageUrl || selectedVideo.thumbnailUrl} 
+                                    alt={selectedVideo.name}
+                                    className="max-w-full max-h-full w-auto h-auto object-contain"
+                                />
+                            )}
+                            {(selectedVideo.mediaType === 'story' || selectedVideo.mediaType === 'poem') && selectedVideo.storyImages && (
+                                <div className="relative w-full h-full flex items-center justify-center">
+                                    <img 
+                                        key={`${selectedVideo.id}-${currentPage}`}
+                                        src={selectedVideo.storyImages[currentPage]?.url || selectedVideo.thumbnailUrl} 
+                                        alt={`${selectedVideo.name} - Page ${currentPage + 1}`}
+                                        className="max-w-full max-h-full w-auto h-auto"
+                                        style={{ 
+                                            objectFit: 'contain',
+                                            width: 'auto',
+                                            height: 'auto',
+                                            maxWidth: '100%',
+                                            maxHeight: '100%'
+                                        }}
+                                        onLoad={(e) => {
+                                            // Ensure consistent sizing for all images
+                                            const img = e.target as HTMLImageElement;
+                                            img.style.objectFit = 'contain';
+                                            img.style.width = 'auto';
+                                            img.style.height = 'auto';
+                                        }}
+                                    />
+                                    
+                                    {/* Navigation arrows for multi-page content */}
+                                    {selectedVideo.storyImages.length > 1 && (
+                                        <>
+                                            {currentPage > 0 && (
+                                                <button 
+                                                    onClick={prevPage}
+                                                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full w-12 h-12 flex items-center justify-center transition-colors"
+                                                >
+                                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                            {currentPage < selectedVideo.storyImages.length - 1 && (
+                                                <button 
+                                                    onClick={nextPage}
+                                                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full w-12 h-12 flex items-center justify-center transition-colors"
+                                                >
+                                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                            
+                                            {/* Page indicator */}
+                                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
+                                                {currentPage + 1} / {selectedVideo.storyImages.length}
+                                            </div>
+                                        </>
+                                    )}
+                                    
+                                    {/* Slide hint */}
+                                    {showSlideHint && selectedVideo.storyImages.length > 1 && (
+                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded-lg text-sm animate-pulse">
+                                            Swipe or use arrows to navigate pages
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                         <div className="p-4 sm:p-5 bg-white/15 backdrop-blur-md text-black" style={{ fontFamily: 'Poppins, sans-serif' }}>
                         <div className="font-semibold text-xl sm:text-xl">{selectedVideo.name}</div>
