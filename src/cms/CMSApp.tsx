@@ -50,7 +50,10 @@ function CMSApp() {
   console.log('[CMSApp] Environment check:', {
     supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
     supabaseKey: import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Present' : 'Missing',
-    superAdminEmail: import.meta.env.VITE_SUPERADMIN_EMAIL
+    superAdminEmail: import.meta.env.VITE_SUPERADMIN_EMAIL,
+    userEmail: userEmail,
+    isSuperAdmin: isSuperAdmin,
+    currentPath: location.pathname
   })
 
   return (
@@ -112,6 +115,9 @@ function CMSApp() {
         <Route path="/cms" element={isSignedIn ? <CMS /> : <Navigate to="/" replace />} />
         <Route path="/superadmin" element={isSignedIn && isSuperAdmin ? <SuperAdmin /> : <Navigate to="/" replace />} />
         <Route path="/bunny" element={isSignedIn && isSuperAdmin ? <BunnyExplorer /> : <Navigate to="/" replace />} />
+        <Route path="/login/cms" element={isSignedIn ? <CMS /> : <Navigate to="/" replace />} />
+        <Route path="/login/superadmin" element={isSignedIn && isSuperAdmin ? <SuperAdmin /> : <Navigate to="/" replace />} />
+        <Route path="/login/bunny" element={isSignedIn && isSuperAdmin ? <BunnyExplorer /> : <Navigate to="/" replace />} />
       </Routes>
       {showLogin && (
         <LoginModal
