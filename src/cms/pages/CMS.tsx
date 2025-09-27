@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useI18n } from '../lib/i18n'
 import { uploadToBunny } from '../lib/bunny'
 import { supabase } from '../../../services/supabaseClient'
@@ -88,47 +88,35 @@ export default function CMS() {
 
   // Generate image previews when story images change
   useEffect(() => {
+    let revoked: string[] = [];
     if (form.storyImages.length > 0) {
-      const previews: string[] = []
-      
-      form.storyImages.forEach((file, index) => {
-        // Use object URL for better mobile compatibility
-        const objectUrl = URL.createObjectURL(file)
-        previews[index] = objectUrl
-      })
-      
-      setImagePreviews([...previews])
+      const previews: string[] = form.storyImages.map((file) => {
+        const objectUrl = URL.createObjectURL(file);
+        revoked.push(objectUrl);
+        return objectUrl;
+      });
+      setImagePreviews(previews);
     } else {
-      setImagePreviews([])
+      setImagePreviews([]);
     }
-    
     // Cleanup object URLs when component unmounts or images change
     return () => {
-      imagePreviews.forEach(url => {
+      revoked.forEach((url) => {
         if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url)
+          URL.revokeObjectURL(url);
         }
-      })
-    }
-  }, [form.storyImages])
+      });
+    };
+  }, [form.storyImages]);
 
   // Function to reorder images
   const reorderImages = (fromIndex: number, toIndex: number) => {
-    const newImages = [...form.storyImages]
-    const [movedImage] = newImages.splice(fromIndex, 1)
-    newImages.splice(toIndex, 0, movedImage)
-    
-    // Update form first
-    setForm({ ...form, storyImages: newImages })
-    
-    // Force preview update with a small delay for mobile
-    setTimeout(() => {
-      const newPreviews = [...imagePreviews]
-      const [movedPreview] = newPreviews.splice(fromIndex, 1)
-      newPreviews.splice(toIndex, 0, movedPreview)
-      setImagePreviews(newPreviews)
-    }, 50)
-  }
+    const newImages = [...form.storyImages];
+    const [movedImage] = newImages.splice(fromIndex, 1);
+    newImages.splice(toIndex, 0, movedImage);
+    setForm({ ...form, storyImages: newImages });
+    // imagePreviews will update automatically via useEffect
+  };
 
   // Function to remove an image
   const removeImage = (index: number) => {
