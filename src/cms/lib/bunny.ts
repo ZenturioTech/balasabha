@@ -72,102 +72,82 @@ export type BunnyEntry = {
 
 // List directory contents from Bunny Storage (root or nested). Use empty path for root.
 export async function listBunnyDirectory(path: string = ''): Promise<BunnyEntry[]> {
-  const normalizedPath = path ? path.replace(/^\/+|\/+$/g, '') + '/' : ''
-
-  // Check for required environment variables
-  const apiKey = String(import.meta.env.VITE_BUNNY_API_KEY || '').trim()
-  const storageZone = String(import.meta.env.VITE_BUNNY_STORAGE_ZONE || '').trim()
-  const hostname = String(import.meta.env.VITE_BUNNY_HOSTNAME || '').trim()
-  
-  if (!apiKey || !storageZone || !hostname) {
-    const missingVars = []
-    if (!apiKey) missingVars.push('VITE_BUNNY_API_KEY')
-    if (!storageZone) missingVars.push('VITE_BUNNY_STORAGE_ZONE')
-    if (!hostname) missingVars.push('VITE_BUNNY_HOSTNAME')
-    throw new Error(`Missing Bunny CDN configuration: ${missingVars.join(', ')}. Please set these environment variables.`)
-  }
-
-  const url = `https://${hostname}/${storageZone}/${normalizedPath}`
+  const url = `/api/bunny/list?path=${encodeURIComponent(path || '')}`
   
   try {
-    console.debug('[Bunny] List directory', {
-      mode: import.meta.env.MODE,
-      host: hostname,
-      storageZone,
-      normalizedPath: `/${normalizedPath}`,
-      url,
-      apiKeyLength: apiKey.length,
-    })
+    console.debug('[Bunny] List directory via API', { path, url })
   } catch {}
   
   const res = await fetch(url, {
     method: 'GET',
-    headers: { 
-      AccessKey: apiKey, 
-      Accept: 'application/json' 
-    } as any,
+    headers: {
+      'Accept': 'application/json'
+    }
   })
   
   if (!res.ok) {
-    const text = await res.text().catch(() => '')
-    try { 
-      console.debug('[Bunny] List failed', { 
-        status: res.status, 
-        statusText: res.statusText, 
-        body: text?.slice(0, 300),
-        url 
-      }) 
-    } catch {}
-    throw new Error(`Bunny CDN list failed: ${res.status} ${res.statusText}. ${text ? `Response: ${text.slice(0, 100)}` : ''}`)
+    let errorData
+    try {
+      errorData = await res.json()
+    } catch {
+      const text = await res.text().catch(() => '')
+      throw new Error(`Bunny API error: ${res.status} ${res.statusText}. ${text ? `Response: ${text.slice(0, 100)}` : ''}`)
+    }
+    
+    console.error('[Bunny] List failed', { 
+      status: res.status, 
+      statusText: res.statusText, 
+      error: errorData 
+    })
+    
+    throw new Error(errorData.error || `Bunny API error: ${res.status} ${res.statusText}`)
   }
   
-  let data
-  try {
-    data = await res.json()
-  } catch (parseError) {
-    const text = await res.text().catch(() => '')
-    console.error('[Bunny] JSON parse error', { parseError, responseText: text?.slice(0, 200) })
-    throw new Error(`Invalid JSON response from Bunny CDN. Response: ${text?.slice(0, 100)}`)
+  const data = await res.json()
+  
+  if (!Array.isArray(data)) {
+    console.error('[Bunny] Invalid response format', { data })
+    throw new Error('Invalid response format from Bunny API')
   }
   
-  return (data || []).map((e: any) => ({
-    guid: e.Guid,
-    path: e.Path,
-    objectName: e.ObjectName,
-    isDirectory: Boolean(e.IsDirectory),
-    size: Number(e.Length || 0),
-    lastChanged: e.LastChanged,
-  }))
+  return data
 }
 
 // Delete a file at the given path (relative to storage zone). Example: "district/file.jpg"
 export async function deleteBunnyPath(path: string): Promise<void> {
-  const apiKey = String(import.meta.env.VITE_BUNNY_API_KEY || '').trim()
-  const storageZone = String(import.meta.env.VITE_BUNNY_STORAGE_ZONE || '').trim()
-  const hostname = String(import.meta.env.VITE_BUNNY_HOSTNAME || '').trim()
-  if (!apiKey || !storageZone || !hostname) throw new Error('Missing Bunny env configuration')
-
-  const normalized = path.replace(/^\/+/, '')
-  const url = `https://${hostname}/${storageZone}/${normalized}`
+  const url = `/api/bunny/delete?path=${encodeURIComponent(path)}`
+  
   try {
-    console.debug('[Bunny] Delete init', {
-      mode: import.meta.env.MODE,
-      host: hostname,
-      storageZone,
-      normalizedPath: `/${normalized}`,
-      url,
-      apiKeyLength: apiKey.length,
-    })
+    console.debug('[Bunny] Delete file via API', { path, url })
   } catch {}
+  
   const res = await fetch(url, {
     method: 'DELETE',
-    headers: { AccessKey: apiKey } as any,
+    headers: {
+      'Accept': 'application/json'
+    }
   })
+  
   if (!res.ok) {
-    const text = await res.text().catch(() => '')
-    try { console.debug('[Bunny] Delete failed', { status: res.status, statusText: res.statusText, body: text?.slice(0, 300) }) } catch {}
-    throw new Error(`Bunny delete failed: ${res.status} ${text}`)
+    let errorData
+    try {
+      errorData = await res.json()
+    } catch {
+      const text = await res.text().catch(() => '')
+      throw new Error(`Bunny API error: ${res.status} ${res.statusText}. ${text ? `Response: ${text.slice(0, 100)}` : ''}`)
+    }
+    
+    console.error('[Bunny] Delete failed', { 
+      status: res.status, 
+      statusText: res.statusText, 
+      error: errorData 
+    })
+    
+    throw new Error(errorData.error || `Bunny API error: ${res.status} ${res.statusText}`)
   }
+  
+  const data = await res.json()
+  console.debug('[Bunny] Delete success', { path, data })
 }
 
 export function toPublicUrl(storageRelativePath: string): string {
