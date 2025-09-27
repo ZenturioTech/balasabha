@@ -30,7 +30,7 @@ const Footer: React.FC = () => {
                         <p className="pt-2 text-gray-900">© Copyright 2025 Kudumbashree I All Rights Reserved</p>
                         <div className="flex justify-center gap-6 pt-1">
                             <button onClick={() => setIsPrivacyPolicyOpen(true)} className="text-teal-600 hover:underline">Privacy Policy</button>
-                            <button onClick={() => setIsTermsOpen(true)} className="text-teal-600 hover:underline">Terms & Condition</button>
+                            <button onClick={() => setIsTermsOpen(true)} className="text-teal-600 hover:underline">Terms & Conditions</button>
                         </div>
                     </div>
 
