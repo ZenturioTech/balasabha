@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Hero from './components/Hero';
 import About from './components/About';
 import Initiative from './components/Initiative';
@@ -8,6 +9,8 @@ import Spotlight from './components/Spotlight';
 import Objectives from './components/Objectives';
 import Footer from './components/Footer';
 import DistrictPage from './components/DistrictPage';
+import CMSApp from './src/cms/CMSApp';
+import { I18nProvider } from './src/cms/lib/i18n';
 
 const Divider: React.FC = () => (
     <div className="px-6 max-w-3xl mx-auto">
@@ -20,7 +23,7 @@ interface SelectedDistrict {
     imageUrl: string;
 }
 
-const App: React.FC = () => {
+const MainApp: React.FC = () => {
     const [selectedDistrict, setSelectedDistrict] = useState<SelectedDistrict | null>(null);
     const [showDistrictsOnHome, setShowDistrictsOnHome] = useState<boolean>(false);
 
@@ -95,6 +98,17 @@ const App: React.FC = () => {
             </main>
             <Footer />
         </>
+    );
+}
+
+const App: React.FC = () => {
+    return (
+        <Router>
+            <Routes>
+                <Route path="/" element={<MainApp />} />
+                <Route path="/login/*" element={<I18nProvider><CMSApp /></I18nProvider>} />
+            </Routes>
+        </Router>
     );
 }
 
