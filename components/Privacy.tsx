@@ -30,12 +30,15 @@ const Privacy: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                     </svg>
                 </button>
                 <h2 id="privacy-policy-title" className="text-2xl font-bold text-teal-600 mb-4 font-serif">Privacy Policy</h2>
-                <div className="space-y-3 text-gray-700 leading-relaxed">
-                    <p>We respect your privacy. This website does not collect personal information from children or users, except for basic details shared voluntarily during registration or participation in Balasabha activities.</p>
-                    <p>Any information collected will only be used for educational and community purposes.</p>
-                    <p>We do not share your information with third parties.</p>
-                    <p>This site may contain links to other government or educational websites; we are not responsible for their content or privacy practices.</p>
-                    <p>If you have concerns about your data, you may contact the site administrators.</p>
+                <div className="space-y-4 text-gray-700 leading-relaxed">
+                    <p>We respect your privacy. This website's data handling practices are as follows:</p>
+                    <ul className="list-disc list-inside space-y-2 pl-2">
+                        <li>We do not collect personal information from children or users, except for basic details shared voluntarily during registration or participation in Balasabha activities.</li>
+                        <li>Any information collected will only be used for educational and community purposes.</li>
+                        <li>We do not share your information with third parties.</li>
+                        <li>This site may contain links to other government or educational websites,we are not responsible for their content or privacy practices.</li>
+                        <li>If you have concerns about your data, you may contact the site administrators.</li>
+                    </ul>
                 </div>
             </div>
         </div>
