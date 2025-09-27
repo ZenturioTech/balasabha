@@ -37,7 +37,7 @@ const Footer: React.FC = () => {
                     {/* Designed By */}
                     <div className="text-center md:text-right flex-shrink-0">
                         <p className="text-teal-700">Designed & Developed by</p>
-                        <a href="#" className="text-teal-800 font-semibold hover:underline">Zenturiotech Private ltd.</a>
+                        <a href="https://zenturiotech.com" target="_blank" rel="noopener noreferrer" className="text-teal-800 font-semibold hover:underline">Zenturiotech Private Limited.</a>
                     </div>
                 </div>
             </footer>
