@@ -1554,7 +1554,11 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                 const mapped: SpotlightVideo[] = (data as MetadataRow[])
                     .filter((row) => {
                         const mt = (row.metadata as any)?.mediaType;
-                        return mt && String(mt).toLowerCase() === 'video';
+                        const isValid = mt && ['video', 'image', 'story', 'poem'].includes(String(mt).toLowerCase());
+                        if (mt) {
+                            console.log('[Spotlight] Media type found:', { mediaType: mt, isValid, name: row.metadata?.name });
+                        }
+                        return isValid;
                     })
                     .map((row) => {
                     const m = row.metadata ?? {};
@@ -1597,11 +1601,11 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                         imageUrl: m.imageUrl,
                         storyImages: m.storyImages,
                     };
-                }).filter(v => v.videoUrl);
+                }).filter(v => v.videoUrl || v.imageUrl || (v.storyImages && v.storyImages.length > 0));
 
-                // Debug: mapped videos
+                // Debug: mapped content
                 // eslint-disable-next-line no-console
-                console.log('[Spotlight] Mapped videos count', mapped.length, mapped.slice(0, 3));
+                console.log('[Spotlight] Mapped content count', mapped.length, mapped.slice(0, 3));
 
                 setAllVideos(uniqueById(mapped));
             } catch (e: any) {
@@ -1733,7 +1737,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                         <div className="text-red-600 mb-6">{error}</div>
                     )}
                     {loading && (
-                        <div className="text-gray-600 mb-6">Loading videos...</div>
+                        <div className="text-gray-600 mb-6">Loading content...</div>
                     )}
                     {!loading && !error && displayVideos.length === 0 && (
                         <div className="text-gray-600 mb-6">No content available.</div>
@@ -1742,8 +1746,14 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                     <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:hidden ">
                         {limitedVideos.map((video) => (
                             <div key={video.id} className="group relative" onClick={() => openModal(video)}>
-                                <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg">
-                                    <img src={video.thumbnailUrl} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Spotlight video thumbnail" />
+                                <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg aspect-[3/4]">
+                                    <img 
+                                        src={video.thumbnailUrl} 
+                                        className={`w-full h-full transition-transform duration-300 group-hover:scale-110 ${
+                                            (video.mediaType === 'story' || video.mediaType === 'poem') ? 'object-contain' : 'object-cover'
+                                        }`}
+                                        alt="Spotlight content thumbnail" 
+                                    />
                                     <div className="absolute inset-0 bg-gradient-to-t from-teal-800/80 via-transparent to-black/20"></div>
                                     <div className="absolute top-3 left-3 flex items-center gap-1 text-white text-xs bg-black/30 px-2 py-1 rounded-full">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
@@ -1751,7 +1761,15 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                                     </div>
                                     <div className="absolute inset-0 flex items-center justify-center">
                                         <div className="w-14 h-14 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-white/50 group-hover:scale-110">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
+                                            {video.mediaType === 'video' ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
+                                            ) : video.mediaType === 'image' ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" /></svg>
+                                            ) : (video.mediaType === 'story' || video.mediaType === 'poem') ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" /></svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="absolute bottom-0 left-0 p-4 text-white">
@@ -1774,8 +1792,14 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                     console.log('[Spotlight] Open modal for video', video);
                                         openModal(video);
                                     }}>
-                                        <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg">
-                                            <img src={video.thumbnailUrl} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" alt="Spotlight video thumbnail" />
+                                        <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg aspect-[3/4]">
+                                            <img 
+                                                src={video.thumbnailUrl} 
+                                                className={`w-full h-full transition-transform duration-300 group-hover:scale-110 ${
+                                                    (video.mediaType === 'story' || video.mediaType === 'poem') ? 'object-contain' : 'object-cover'
+                                                }`}
+                                                alt="Spotlight content thumbnail" 
+                                            />
                                             <div className="absolute inset-0 bg-gradient-to-t from-teal-800/80 via-transparent to-black/20"></div>
                                             <div className="absolute top-3 left-3 flex items-center gap-1 text-white text-xs bg-black/30 px-2 py-1 rounded-full">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
@@ -1783,7 +1807,15 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                                             </div>
                                             <div className="absolute inset-0 flex items-center justify-center">
                                                 <div className="w-14 h-14 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-white/50 group-hover:scale-110">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
+                                                    {video.mediaType === 'video' ? (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
+                                                    ) : video.mediaType === 'image' ? (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" /></svg>
+                                                    ) : (video.mediaType === 'story' || video.mediaType === 'poem') ? (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" /></svg>
+                                                    ) : (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="absolute bottom-0 left-0 p-4 text-white">
@@ -1889,19 +1921,19 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                             <div className="text-gray-600 mb-6">Searching...</div>
                         )}
                         {!isSearching && searchResults.length === 0 && (
-                            <div className="text-gray-600 mb-6">No matching videos found.</div>
+                            <div className="text-gray-600 mb-6">No matching content found.</div>
                         )}
                         {!isSearching && searchResults.length > 0 && (
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                 {searchResults.map(video => (
                                     <div key={video.id} className="group relative" onClick={() => openModal(video)}>
-                                        <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg">
+                                        <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg aspect-[3/4]">
                                             <img 
                                                 src={video.thumbnailUrl} 
                                                 className={`w-full h-full transition-transform duration-300 group-hover:scale-110 ${
                                                     (video.mediaType === 'story' || video.mediaType === 'poem') ? 'object-contain' : 'object-cover'
                                                 }`}
-                                                alt="Video thumbnail" 
+                                                alt="Content thumbnail" 
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-teal-800/80 via-transparent to-black/20"></div>
                                             <div className="absolute top-3 left-3 flex items-center gap-1 text-white text-xs bg-black/30 px-2 py-1 rounded-full">
@@ -1910,7 +1942,15 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                                             </div>
                                             <div className="absolute inset-0 flex items-center justify-center">
                                                 <div className="w-14 h-14 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-white/50 group-hover:scale-110">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
+                                                    {video.mediaType === 'video' ? (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
+                                                    ) : video.mediaType === 'image' ? (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" /></svg>
+                                                    ) : (video.mediaType === 'story' || video.mediaType === 'poem') ? (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" /></svg>
+                                                    ) : (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="absolute bottom-0 left-0 p-4 text-white">
