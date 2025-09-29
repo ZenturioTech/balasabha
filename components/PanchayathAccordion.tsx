@@ -370,24 +370,29 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
                                 <div className="text-red-600 text-center py-4">{item.error}</div>
                             )}
                             {!item.loading && !item.error && item.videos.length > 0 && (
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                    {item.videos.map(video => (
+                                <div className="max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-teal-300 scrollbar-track-gray-100 hover:scrollbar-thumb-teal-400">
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-2">
+                                        {item.videos.map(video => (
                                         <div key={video.id} className="group relative" onClick={() => openModal(video)}>
-                                            <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg bg-white">
+                                            <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg bg-white aspect-[9/16]">
                                                 <img 
                                                     src={video.thumbnailUrl} 
                                                     className={`w-full h-full transition-transform duration-300 group-hover:scale-110 ${
                                                         (video.mediaType === 'story' || video.mediaType === 'poem') ? 'object-contain' : 'object-cover'
                                                     }`}
-                                                    alt="Video thumbnail" 
+                                                    alt="Content thumbnail" 
                                                 />
                                                 <div className="absolute inset-0 bg-gradient-to-t from-teal-800/80 via-transparent to-black/20"></div>
                                                  <div className="absolute inset-0 flex items-center justify-center">
                                                     <div className="w-12 h-12 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-white/50 group-hover:scale-110">
                                                         {video.mediaType === 'video' ? (
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
-                                                        ) : (
+                                                        ) : video.mediaType === 'image' ? (
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" /></svg>
+                                                        ) : (video.mediaType === 'story' || video.mediaType === 'poem') ? (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" /></svg>
+                                                        ) : (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
                                                         )}
                                                     </div>
                                                 </div>
@@ -398,6 +403,7 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
                                             </div>
                                         </div>
                                     ))}
+                                    </div>
                                 </div>
                             )}
                             {!item.loading && !item.error && item.videos.length === 0 && (

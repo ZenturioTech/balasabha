@@ -51,7 +51,7 @@ const DESKTOP_TILE_COUNT = 8;
 
 const districts = [
     'Trivandrum', 'Kollam', 'Alappuzha', 'Kottayam', 'Idukki', 'Ernakulam', 'Thrissur', 'Palakkad',
-    'Malappuram', 'Kozhikode', 'Kannur', 'Wayanad', 'Kasaragod', 'Pathanamthitta', 'Urban Localbodies'
+    'Malappuram', 'Kozhikkode', 'Kannur', 'Wayanad', 'Kasaragod', 'Pathanamthitta', 'Urban Localbodies'
 ];
 
 const districtImages = [
@@ -1746,7 +1746,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                     <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:hidden ">
                         {limitedVideos.map((video) => (
                             <div key={video.id} className="group relative" onClick={() => openModal(video)}>
-                                <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg aspect-[3/4]">
+                                <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg aspect-[9/16]">
                                     <img 
                                         src={video.thumbnailUrl} 
                                         className={`w-full h-full transition-transform duration-300 group-hover:scale-110 ${
@@ -1924,10 +1924,11 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                             <div className="text-gray-600 mb-6">No matching content found.</div>
                         )}
                         {!isSearching && searchResults.length > 0 && (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                {searchResults.map(video => (
+                            <div className="max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-teal-300 scrollbar-track-gray-100 hover:scrollbar-thumb-teal-400">
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-2">
+                                    {searchResults.map(video => (
                                     <div key={video.id} className="group relative" onClick={() => openModal(video)}>
-                                        <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg aspect-[3/4]">
+                                        <div className="relative overflow-hidden border-[6px] border-white cursor-pointer shadow-lg aspect-[9/16]">
                                             <img 
                                                 src={video.thumbnailUrl} 
                                                 className={`w-full h-full transition-transform duration-300 group-hover:scale-110 ${
@@ -1960,6 +1961,7 @@ const Spotlight: React.FC<SpotlightProps> = ({ onSelectDistrict, startInDistrict
                                         </div>
                                     </div>
                                 ))}
+                                </div>
                             </div>
                         )}
                     </div>
