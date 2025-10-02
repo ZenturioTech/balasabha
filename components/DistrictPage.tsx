@@ -544,9 +544,15 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
                                 ×
                             </span>
                         </button>
-                        <div className="w-full bg-black flex-1 flex items-center justify-center relative">
+                        <div className="w-full bg-black flex-1 flex items-center justify-center relative overflow-hidden">
                             {selectedVideo.mediaType === 'video' && (
-                                <video controls preload="metadata" poster={selectedVideo.thumbnailUrl} className="w-full h-full object-contain">
+                                <video 
+                                    controls 
+                                    preload="metadata" 
+                                    poster={selectedVideo.thumbnailUrl} 
+                                    className="max-w-full max-h-full object-contain"
+                                    style={{ width: '100%', height: '100%' }}
+                                >
                                     <source src={selectedVideo.videoUrl} />
                                 </video>
                             )}
@@ -554,28 +560,18 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
                                 <img 
                                     src={selectedVideo.imageUrl || selectedVideo.thumbnailUrl} 
                                     alt={selectedVideo.name}
-                                    className="w-full h-full object-contain"
-                                    style={{ 
-                                        objectFit: 'contain',
-                                        width: '100%',
-                                        height: '100%',
-                                        maxHeight: '100%'
-                                    }}
+                                    className="max-w-full max-h-full object-contain"
+                                    style={{ width: '100%', height: '100%' }}
                                 />
                             )}
                             {(selectedVideo.mediaType === 'story' || selectedVideo.mediaType === 'poem') && selectedVideo.storyImages && (
-                                <div className="relative w-full flex-1 flex items-center justify-center">
+                                <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
                                     <img 
                                         key={`${selectedVideo.id}-${currentPage}`}
                                         src={selectedVideo.storyImages[currentPage]?.url || selectedVideo.thumbnailUrl} 
                                         alt={`${selectedVideo.name} - Page ${currentPage + 1}`}
-                                        className="w-full h-full object-contain"
-                                        style={{ 
-                                            objectFit: 'contain',
-                                            width: '100%',
-                                            height: '100%',
-                                            maxHeight: '100%'
-                                        }}
+                                        className="max-w-full max-h-full object-contain"
+                                        style={{ width: '100%', height: '100%' }}
                                     />
                                     
                                     {/* Navigation arrows for multi-page content */}
@@ -618,7 +614,7 @@ const DistrictPage: React.FC<DistrictPageProps> = ({ districtName, imageUrl, onB
                                 </div>
                             )}
                         </div>
-                        <div className="p-4 sm:p-5 bg-white/15 backdrop-blur-md text-black" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                        <div className="p-4 sm:p-5 bg-white text-black shrink-0" style={{ fontFamily: 'Poppins, sans-serif' }}>
                             <div className="font-semibold text-xl sm:text-xl">{selectedVideo.name}</div>
                             <div className="text-sm sm:text-base opacity-90">{selectedVideo.district}</div>
                             <div className="text-sm sm:text-base opacity-95">{selectedVideo.wardLabel}{selectedVideo.wardLabel ? ', ' : ''}{selectedVideo.panchayath}</div>

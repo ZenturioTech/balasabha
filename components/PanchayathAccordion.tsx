@@ -428,9 +428,15 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
                     <button type="button" aria-label="Close" className="absolute z-20 top-3 right-3 bg-black/60 hover:bg-black/80 text-white rounded-full w-10 h-10 flex items-center justify-center text-2xl leading-none" onClick={closeModal}>
                         <span className="-mt-px" aria-hidden>×</span>
                     </button>
-                    <div className="w-full bg-black flex-1 flex items-center justify-center">
+                    <div className="w-full bg-black flex-1 flex items-center justify-center relative overflow-hidden">
                         {selectedVideo.mediaType === 'video' && (
-                            <video controls preload="metadata" poster={selectedVideo.thumbnailUrl} className="w-full h-full object-contain">
+                            <video 
+                                controls 
+                                preload="metadata" 
+                                poster={selectedVideo.thumbnailUrl} 
+                                className="max-w-full max-h-full object-contain"
+                                style={{ width: '100%', height: '100%' }}
+                            >
                                 <source src={selectedVideo.videoUrl} />
                             </video>
                         )}
@@ -438,28 +444,18 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
                             <img 
                                 src={selectedVideo.imageUrl || selectedVideo.thumbnailUrl} 
                                 alt={selectedVideo.name}
-                                className="w-full h-full object-contain"
-                                style={{ 
-                                    objectFit: 'contain',
-                                    width: '100%',
-                                    height: '100%',
-                                    maxHeight: '100%'
-                                }}
+                                className="max-w-full max-h-full object-contain"
+                                style={{ width: '100%', height: '100%' }}
                             />
                         )}
                         {(selectedVideo.mediaType === 'story' || selectedVideo.mediaType === 'poem') && selectedVideo.storyImages && (
-                            <div className="relative w-full flex-1 flex items-center justify-center">
+                            <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
                                 <img 
                                     key={`${selectedVideo.id}-${currentPage}`}
                                     src={selectedVideo.storyImages[currentPage]?.url || selectedVideo.thumbnailUrl} 
                                     alt={`${selectedVideo.name} - Page ${currentPage + 1}`}
-                                    className="w-full h-full object-contain"
-                                    style={{ 
-                                        objectFit: 'contain',
-                                        width: '100%',
-                                        height: '100%',
-                                        maxHeight: '100%'
-                                    }}
+                                    className="max-w-full max-h-full object-contain"
+                                    style={{ width: '100%', height: '100%' }}
                                 />
                                 
                                 {/* Navigation arrows for multi-page content */}
@@ -502,7 +498,7 @@ const PanchayathAccordion: React.FC<PanchayathAccordionProps> = ({ districtName 
                             </div>
                         )}
                     </div>
-                    <div className="p-4 sm:p-5 bg-white/15 backdrop-blur-md text-black" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    <div className="p-4 sm:p-5 bg-white text-black shrink-0" style={{ fontFamily: 'Poppins, sans-serif' }}>
                         <div className="font-semibold text-xl sm:text-xl">{selectedVideo.name}</div>
                         <div className="text-sm sm:text-base opacity-90">{selectedVideo.district}</div>
                         <div className="text-sm sm:text-base opacity-95">{selectedVideo.wardLabel}{selectedVideo.wardLabel ? ', ' : ''}{selectedVideo.panchayath}</div>
