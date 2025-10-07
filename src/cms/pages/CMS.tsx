@@ -453,21 +453,19 @@ export default function CMS() {
 
       console.debug('[CMS] Upload and DB insert succeeded for media type:', form.mediaType)
       
-      // Reset form after successful upload
-      setForm({
+      // Reset form after successful upload, but preserve location and areaType selections
+      setForm((prev) => ({
+        ...prev,
         name: '',
-        district: '',
-        block: '',
-        areaType: 'block',
-        ulb: '',
-        panchayath: '',
         ward: '',
         mediaType: 'image',
         imageFile: null,
         thumbFile: null,
         videoFile: null,
         storyImages: [],
-      })
+        // For block users, require panchayath selection again; irrelevant for ULB
+        panchayath: prev.areaType === 'block' ? '' : '',
+      }))
       
       setSuccessVisible(true)
       console.debug('[CMS] Success popup should be visible now')
