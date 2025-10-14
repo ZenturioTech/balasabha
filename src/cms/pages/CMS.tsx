@@ -11,11 +11,12 @@ type CmsForm = {
   ulb: string
   panchayath: string
   ward: string
-  mediaType: 'image' | 'video' | 'story' | 'poem'
+  mediaType: 'image' | 'video' | 'story' | 'poem' | 'pdf'
   imageFile: File | null
   thumbFile: File | null
   videoFile: File | null
   storyImages: File[]
+  pdfFile: File | null
 }
 
 export default function CMS() {
@@ -33,6 +34,7 @@ export default function CMS() {
     thumbFile: null,
     videoFile: null,
     storyImages: [],
+    pdfFile: null,
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -52,6 +54,7 @@ export default function CMS() {
   const [singleImagePreview, setSingleImagePreview] = useState<string | null>(null)
   const [videoPreview, setVideoPreview] = useState<string | null>(null)
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
+  const [pdfPreview, setPdfPreview] = useState<string | null>(null)
 
   // Generate single image preview when image file changes
   useEffect(() => {
@@ -85,6 +88,17 @@ export default function CMS() {
       setThumbnailPreview(null)
     }
   }, [form.thumbFile])
+
+  // Generate PDF preview when PDF file changes
+  useEffect(() => {
+    if (form.pdfFile) {
+      const objectUrl = URL.createObjectURL(form.pdfFile)
+      setPdfPreview(objectUrl)
+      return () => URL.revokeObjectURL(objectUrl)
+    } else {
+      setPdfPreview(null)
+    }
+  }, [form.pdfFile])
 
   // Generate image previews when story images change
   useEffect(() => {
@@ -359,6 +373,7 @@ export default function CMS() {
       let imageUrl: string | null = null
       let thumbUrl: string | null = null
       let videoUrl: string | null = null
+      let pdfUrl: string | null = null
       // Determine target location strings
       const currentDistrict = form.district || userMeta?.district || ''
       // For ULB area type, folder should be district/<municipalityname + 'ulb'> e.g., aluvaulb
@@ -386,6 +401,11 @@ export default function CMS() {
         if (form.storyImages.length === 0) throw new Error('Please upload at least one image for your story or poem')
         // For story/poem, we'll store only images in metadata
         // Multiple images will be handled in metadata preparation below
+      } else if (form.mediaType === 'pdf') {
+        if (!form.pdfFile) throw new Error('Please select a PDF file')
+        const targetBlockOrUlb = form.areaType === 'ulb' ? ulbFolder : (isSuperAdmin ? form.block : (userMeta?.blockName || ''))
+        const uploaded = await uploadToBunny({ file: form.pdfFile, district: currentDistrict, blockOrUlb: targetBlockOrUlb, areaType: form.areaType, panchayath: form.areaType === 'block' ? form.panchayath : undefined })
+        pdfUrl = uploaded.publicUrl
       }
 
       // Prepare story images metadata
@@ -427,6 +447,7 @@ export default function CMS() {
         imageUrl: imageUrl ?? undefined,
         thumbnailUrl: thumbUrl ?? undefined,
         videoUrl: videoUrl ?? undefined,
+        pdfUrl: pdfUrl ?? undefined,
         storyText: undefined,
         storyLanguage: undefined,
         storyImages: storyImagesMetadata,
@@ -656,8 +677,12 @@ export default function CMS() {
               {t('cms_story')}
             </label>
             <label style={{ display: 'inline-flex', gap: '.5rem', alignItems: 'center' }}>
-              <input type="radio" name="mediaType" checked={form.mediaType === 'poem'} onChange={() => setForm({ ...form, mediaType: 'poem', imageFile: null, thumbFile: null, videoFile: null, storyImages: [] })} />
+              <input type="radio" name="mediaType" checked={form.mediaType === 'poem'} onChange={() => setForm({ ...form, mediaType: 'poem', imageFile: null, thumbFile: null, videoFile: null, storyImages: [], pdfFile: null })} />
               {t('cms_poem')}
+            </label>
+            <label style={{ display: 'inline-flex', gap: '.5rem', alignItems: 'center' }}>
+              <input type="radio" name="mediaType" checked={form.mediaType === 'pdf'} onChange={() => setForm({ ...form, mediaType: 'pdf', imageFile: null, thumbFile: null, videoFile: null, storyImages: [] })} />
+              PDF
             </label>
           </div>
         </label>
@@ -999,6 +1024,60 @@ export default function CMS() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+          </label>
+        ) : form.mediaType === 'pdf' ? (
+          <label className="field">
+            <span>PDF File</span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>Remember: The display name will be the same as the pdf file name</span>
+            <input
+              type="file"
+              accept="application/pdf"
+              required
+              onChange={(e) => setForm({ ...form, pdfFile: e.target.files?.[0] ?? null })}
+            />
+            {pdfPreview && (
+              <div style={{ marginTop: '0.5rem' }}>
+                <p style={{ fontSize: '0.9rem', margin: '0 0 0.5rem 0', fontWeight: '600' }}>
+                  Selected PDF:
+                </p>
+                <div style={{ 
+                  position: 'relative',
+                  background: 'var(--glass-bg)', 
+                  border: '1px solid var(--glass-border)', 
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  boxShadow: 'var(--glass-shadow)',
+                  maxWidth: '300px'
+                }}>
+                  <iframe 
+                    src={pdfPreview} 
+                    title="PDF preview"
+                    style={{
+                      width: '100%',
+                      height: '200px',
+                      border: 'none',
+                      display: 'block'
+                    }}
+                    onError={(e) => {
+                      console.error('PDF preview failed to load')
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                  <div style={{ padding: '0.5rem' }}>
+                    <p style={{ 
+                      margin: '0', 
+                      fontSize: '0.8rem', 
+                      color: 'var(--color-muted)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {form.pdfFile?.name}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
