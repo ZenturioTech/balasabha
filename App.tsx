@@ -117,7 +117,7 @@ const MainApp: React.FC = () => {
                             className="text-base sm:text-xl md:text-2xl font-bold text-teal-600 hover:text-teal-800 group relative inline-flex px-4 sm:px-6 py-2 border-2 border-teal-600 rounded-xl transition-all duration-300 hover:border-teal-800 hover:shadow-lg"
                         >
                             <span className="relative whitespace-normal sm:whitespace-nowrap">
-                                View Lsg Plans and Reports
+                                View LSGD Plans and Reports
                                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-teal-600 transform origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
                             </span>
                             <span className="absolute -top-1 -right-1 flex h-3 w-3">
