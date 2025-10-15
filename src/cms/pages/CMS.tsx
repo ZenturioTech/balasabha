@@ -368,7 +368,8 @@ export default function CMS() {
       }
       if (!form.name.trim()) throw new Error('Please enter your name')
       if (form.areaType === 'block' && !form.panchayath.trim()) throw new Error('Please select/enter Panchayath')
-      if (!form.ward.trim()) throw new Error('Please enter Ward number')
+      // Make ward number mandatory only for non-PDF media types
+      if (form.mediaType !== 'pdf' && !form.ward.trim()) throw new Error('Please enter Ward number')
 
       let imageUrl: string | null = null
       let thumbUrl: string | null = null
@@ -640,15 +641,15 @@ export default function CMS() {
         )}
         
         <label className="field half">
-          <span>Ward</span>
+          <span>Ward {form.mediaType === 'pdf' && '(Optional)'}</span>
           <input
             type="number"
             inputMode="numeric"
             pattern="[0-9]*"
-            required
+            required={form.mediaType !== 'pdf'}
             value={form.ward}
             onChange={(e) => setForm({ ...form, ward: e.target.value.replace(/[^0-9]/g, '') })}
-            placeholder="Ward number"
+            placeholder={form.mediaType === 'pdf' ? 'Ward number (optional)' : 'Ward number'}
           />
         </label>
         <label className="field half">
